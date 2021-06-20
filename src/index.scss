@@ -1,0 +1,341 @@
+  @font-face {
+    font-family: 'Gilroy';
+    src: url('./fonts/Gilroy-Regular.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Gilroy';
+    src: url('./fonts/Gilroy-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'Gilroy';
+    src: url('./fonts/Gilroy-Bold.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+  }
+
+  :root {
+    --bg-color: #ffffff;
+    --primary-color: #626262;
+    --accent: #3569F0;
+    --accent-hover: #285bdb;
+    --app-bg: url("./images/light-bg.png");
+    --action-btn-bg: #ffffff;
+    --icons-color: #41444E;
+    --header-link-color: #3569F0;
+    --wallet-text-color: #41444E;
+    --wallet-bg-color: #ffffff;
+    --wallet-border-color: #D7E0FF;
+    --mainblock-bg-color: rgba(255, 255, 255, .6);
+    --mainblock-border-color: #eeeeee;
+    --mainblock-title-color: #333333;
+    --mainblock-footer-bg-color: #ffffff;
+    --mainblock-footer-border-color: transparent;
+    --popup-title-color: #757575;
+    --loader-color: #3569F0;
+    --input-color: rgba(51, 51, 51, 0.5);
+    --input-border-color: rgba(0, 0, 0, 0.1);
+    --account-key-color: rgba(0, 0, 0, .5);
+    --search-input-text-color: rgba(65, 68, 78, .3);
+    --search-input-border-color: #41444E;
+    --select-item-border-color: rgba(0, 0, 0, 0.12);
+    --select-scrollbar-bg-color: rgba(0, 0, 0, 0.1);
+    --search-icon-color: #41444E;
+    --account-inner-border-color: rgba(0, 0, 0, .4);
+    --header-more-link-color: #757575;
+    --range-slider-bg-color: linear-gradient(92.91deg, rgba(0, 0, 0, 0.24) 0%, rgba(0, 0, 0, 0.048) 109.76%);
+    --range-slider-bg-inner-color: transparent;
+    --range-slider-fill-color: linear-gradient(92.92deg, #3569F0 0%, rgba(69, 88, 255, 0.8) 57.82%);
+  }
+
+  html[data-theme="dark"] {
+    --bg-color: #2D2F35;
+    --primary-color: #BBBBBB;
+    --accent: #3569F0;
+    --accent-hover: #285bdb;
+    --app-bg: url("./images/light-bg.png");
+    --action-btn-bg: #41444E;
+    --icons-color: #ffffff;
+    --header-link-color: #ffffff;
+    --wallet-text-color: #ffffff;
+    --wallet-bg-color: #41444E;
+    --wallet-border-color: transparent;
+    --mainblock-bg-color: radial-gradient(83.15% 83.15% at 50% 50%, rgba(50, 53, 64, 1) 0%, rgba(56, 56, 56, 0) 100%);
+    --mainblock-border-color: rgba(255, 255, 255, 0.1);
+    --mainblock-title-color: #ffffff;
+    --mainblock-footer-bg-color: linear-gradient(92.91deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 109.76%);
+    --mainblock-footer-border-color: rgba(255, 255, 255, 0.1);
+    --popup-title-color: #bbbbbb;
+    --loader-color: #ffffff;
+    --input-color: rgba(255, 255, 255, 0.5);
+    --input-border-color: rgba(255, 255, 255, 0.1);
+    --account-key-color: rgba(255, 255, 255, .5);
+    --search-input-text-color: rgba(255, 255, 255, .3);
+    --search-input-border-color: rgba(255, 255, 255, .4);
+    --select-item-border-color: rgba(255, 255, 255, 0.12);
+    --select-scrollbar-bg-color: rgba(255, 255, 255, 0.1);
+    --search-icon-color: #ffffff;
+    --account-inner-border-color: rgba(255, 255, 255, .4);
+    --header-more-link-color: #bbbbbb;
+    --range-slider-bg-color: linear-gradient(92.91deg, #7e8489 0%, #3f4954 109.76%);
+    --range-slider-bg-inner-color: linear-gradient(92.91deg, #414c52 0%, #35404c 109.76%);;
+    --range-slider-fiil-color: linear-gradient(92.92deg, #3569F0 0%, rgba(69, 88, 255, 0.8) 57.82%);
+  }
+
+  * {
+    box-sizing: border-box;
+    // transition: color .2s, background-color .2s;
+  }
+
+  body {
+    font-family: "Gilroy", sans-serif;
+    color: var(--primary-color);
+    font-size: 20px;
+    font-weight: 400;
+    background-color: var(--bg-color);
+    background-image: var(--app-bg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  a {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+
+  button {
+    border: none;
+    cursor: pointer;
+  }
+
+  input[type=number]::-webkit-outer-spin-button,
+  input[type=number]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+  }
+
+  input[type=number] {
+      -moz-appearance:textfield;
+  }
+
+  .btn {
+    display: inline-block;
+    font-family: "Gilroy", sans-serif;
+    font-weight: 700;
+    color: #ffffff;
+    font-size: 26px;
+    text-align: center;
+    padding: 30px 0;
+    background-color: var(--accent);
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--accent-hover);
+    }
+
+    &--disabled {
+      opacity: .5;
+
+      &:hover {
+        background-color: var(--accent);
+        opacity: .5;
+      }
+    }
+  }
+
+  .action-btn {
+    background-color: var(--action-btn-bg);
+    border-radius: 18px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.14);
+
+    &:hover {
+      background-color: var(--action-btn-bg);
+    }
+
+    svg path {
+      fill: var(--icons-color);
+      stroke: var(--icons-color);
+    }
+  }
+
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 250px;
+  }
+
+  .logo {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+
+    path {
+      fill: var(--icons-color);
+      stroke: var(--icons-color);
+    }
+  }
+
+  .confirm {
+    &-subtitle {
+      margin-top: -24px;
+      margin-bottom: 0;
+      color: var(--mainblock-title-color);
+    }
+
+    &-block {
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--account-inner-border-color);
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      margin: 16px 0;
+    }
+
+    &-value {
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--mainblock-title-color);
+      padding-right: 16px;
+      display: flex;
+      align-items: center;
+    }
+
+    &-icon {
+      margin-right: 12px;
+      width: 32px;
+      height: 32px;
+    }
+
+    &-token {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--mainblock-title-color);
+      display: flex;
+      align-items: center;
+    }
+
+    &-text {
+      color: var(--popup-title-color);
+      margin: 0 0 16px;
+
+      span {
+        font-weight: 700;
+        color: var(--mainblock-title-color);
+        white-space: nowrap;
+
+        img {
+          width: 16px;
+          height: 16px;
+        }
+      }
+    }
+  }
+
+  .pool-confirm-wrap {
+    margin-bottom: 40px;
+  }
+  @media screen and (max-width: 2800px) {
+    .beta{
+      text-align: end;
+      top: 15px;
+      right: 70px;
+      position: fixed;
+      font-size:16px;
+    }
+  }
+  @media screen and (max-width: 1025px) {
+    .btn {
+      font-size: 22px;
+      padding: 20px 0;
+      border-radius: 18px;
+    }
+    .beta{
+      text-align: end;
+      top: 15px;
+      right: 15px;
+      position: fixed;
+      font-size:14px
+    }
+
+
+    .action-btn {
+      padding: 10px;
+      border-radius: 12px;
+      width: 45px;
+      height: 45px;
+      svg {
+        transform: scale(0.8);
+      }
+    }
+
+    .confirm-popup {
+      top: 20%;
+    }
+  }
+
+
+  //@media screen and (max-width: 1025px) {
+  //  .beta{
+  //    text-align: end;
+  //    top: 15px;
+  //    right: 10px;
+  //    position: fixed;
+  //    font-size:14px
+  //  }
+  //
+  //
+  //}
+
+  @media screen and (max-width: 899px) {
+    .beta{
+      text-align: end;
+      top: 15px;
+      right: 10px;
+      position: fixed;
+      font-size:12px
+    }
+  }
+  @media screen and (max-width: 550px) {
+    .beta{
+      text-align: end;
+      top: 15px;
+      right: 10px;
+      position: fixed;
+      font-size:10px
+    }
+  }
+
+.mobileBlock {
+  background-color: var(--bg-color);
+  background-image: var(--app-bg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0px;
+  top: 0px;
+  z-index: 555;
+  text-align: center;
+}
+

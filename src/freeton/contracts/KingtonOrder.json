@@ -1,0 +1,22 @@
+{
+  "abi": {
+    "ABI version": 2,
+    "header": ["time"],
+    "functions": [
+      {
+        "name": "constructor",
+        "inputs": [
+          {"name":"destinationAddress","type":"address"},
+          {"name":"message","type":"bytes"}
+        ],
+        "outputs": [
+        ]
+      }
+    ],
+    "data": [
+    ],
+    "events": [
+    ]
+  },
+  "imageBase64": "te6ccgECDQEAAgsAAgE0AwEBAcACAEPQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAib/APSkICLAAZL0oOGK7VNYMPShBgQBCvSkIPShBQAuoAAAAAH4QsjL//hDzws/+EbPCwDJ7VQCASAJBwHq/3+NCGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAT4aSHtRNAg10nCAY4Q0//TP9MA0X/4Yfhm+GP4Yo4Y9AVwAYBA9A7yvdcL//hicPhjcPhmf/hh4tMAAZ+BAgDXGCD5AVj4QvkQ8qje0z8BCAB6jh74QyG5IJ8wIPgjgQPoqIIIG3dAoLnekvhj4IA08jTY0x8hwQMighD////9vLGS8jzgAfAB+EdukvI83gIBIAwKAf+8rnqfJ8ILdHGvaiaBBrpOEAxwhp/+mf6YBov/ww/DN8MfwxRwx6ArgAwCB6B3le64X//DE4fDG4fDM//DDxb3wjeTm4/DN9IGpo/ABBBX14QHwTt4gQ0Nr/kBJkZ8LEZwD9AUA056BnwOfA58j+3V8nEeeKZLj9gHwk5GfChGdAsASo0DyA+gAAAAAAAAAAAAAAAAAc8Wz4HPgcmBAKD7AF8E8AF/+GcAct5wItDWAjHSAPpAMPhp3CHHAJDgIdcNH5LyPOFTEZDhwQMighD////9vLGS8jzgAfAB+EdukvI83g=="
+}

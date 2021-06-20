@@ -1,0 +1,33 @@
+{
+  "abi": {
+    "ABI version": 2,
+    "header": [
+      "time"
+    ],
+    "functions": [
+      {
+        "name": "grant",
+        "inputs": [
+          {
+            "name": "addr",
+            "type": "address"
+          }
+        ],
+        "outputs": [
+        ]
+      },
+      {
+        "name": "constructor",
+        "inputs": [
+        ],
+        "outputs": [
+        ]
+      }
+    ],
+    "data": [
+    ],
+    "events": [
+    ]
+  },
+  "imageBase64": "te6ccgECDgEAAcgAAgE0AwEBAcACAEPQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAib/APSkICLAAZL0oOGK7VNYMPShBgQBCvSkIPShBQAuoAAAAAL4QsjL//hDzws/+EbPCwDJ7VQCASAJBwH8/38h7UTQINdJwgGOENP/0z/TANF/+GH4Zvhj+GKOGPQFcAGAQPQO8r3XC//4YnD4Y3D4Zn/4YeLTAAGfgQIA1xgg+QFY+EL5EPKo3tM/AY4e+EMhuSCfMCD4I4ED6KiCCBt3QKC53pL4Y+CANPI02NMfIcEDIoIQ/////byxCAAckvI84AHwAfhHbpLyPN4CASANCgICdQwLAHG0XVWNfSBo/AAQZGfChGdGgkozsDssAAAAAAAAAAAAAAAAAADni2fA58Dkuf2AGGB/yXgBbz/8M8AAnbRar5/8ILdHGvaiaBBrpOEAxwhp/+mf6YBov/ww/DN8MfwxRwx6ArgAwCB6B3le64X//DE4fDG4fDM//DDxb3wjeTm4/DNo/AB4AT/8M8AAat5wItDWAjHSADDcIccAkOAh1w0fkvI84VMRkOHBAyKCEP////28sZLyPOAB8AH4R26S8jze"
+}
