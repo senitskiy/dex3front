@@ -10,6 +10,7 @@ import { iconGenerator } from '../../iconGenerator';
 import miniSwap from '../../images/icons/mini-swap.png';
 import { checkClientPairExists, getAllClientWallets, subscribe } from '../../extensions/webhook/script';
 import './SwapConfirmPopup.scss';
+import {setManageAsyncIsWaiting} from "../../store/actions/manage";
 
 function SwapConfirmPopup(props) {
   const dispatch = useDispatch();
@@ -85,15 +86,12 @@ function SwapConfirmPopup(props) {
         await pairsList.forEach(async i => {
           if(fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
             let res = await swapA(curExt, pairId, fromValue * 1000000000);
-            if(res.code) {
-              if(res.code === 1000) {
-                dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-              }
-              else {
-                dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-              }
+            if(!res || (res && (res.code === 1000))){
+              dispatch(setSwapAsyncIsWaiting(false))
             }
-            if(!res.code) {
+
+
+            if(res && !res.code) {
               let olderLength = transactionsList.length;
               let newLength = transactionsList.push({
                 type: "swap",
@@ -111,17 +109,27 @@ function SwapConfirmPopup(props) {
             }
           } else if(fromToken.symbol === i.symbolB && toToken.symbol === i.symbolA) {
             let res = await swapB(curExt, pairId, fromValue * 1000000000);
-            if(res.code) {
-              if(res.code === 1000) {
-                dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-                dispatch(setSwapAsyncIsWaiting(false));
-              }
-              else {
-                dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-                dispatch(setSwapAsyncIsWaiting(false));
-              }
+            // if(!res){
+            //   dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+            //   dispatch(setSwapAsyncIsWaiting(false));
+            // }
+
+            //user cancalled for both broxus & extraton
+            if(!res || (res && (res.code === 1000))){
+              dispatch(setSwapAsyncIsWaiting(false))
             }
-            if(!res.code) {
+
+            // if(res && res.code) {
+            //   if(res.code === 1000) {
+            //     dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+            //     dispatch(setSwapAsyncIsWaiting(false));
+            //   }
+            //   else {
+            //     dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+            //     dispatch(setSwapAsyncIsWaiting(false));
+            //   }
+            // }
+            if(res && !res.code) {
               let olderLength = transactionsList.length;
               let newLength = transactionsList.push({
                 type: "swap",

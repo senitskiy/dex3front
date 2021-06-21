@@ -247,7 +247,7 @@ export async function getAllPairsWoithoutProvider() {
  */
 
 export async function getClientBalance(clientAddress) {
-
+console.log("clientAddress",clientAddress)
     let address = clientAddress
     try {
         let clientBalance = await client.net.query_collection({
@@ -259,7 +259,7 @@ export async function getClientBalance(clientAddress) {
             },
             result: "balance",
         });
-
+        console.log("clientBalance",clientBalance)
         return +clientBalance.result[0].balance / 1000000000
     } catch (e) {
         console.log("catch E", e);

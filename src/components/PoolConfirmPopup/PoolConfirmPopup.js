@@ -7,6 +7,7 @@ import { iconGenerator } from '../../iconGenerator';
 import MainBlock from '../MainBlock/MainBlock';
 import CloseBtn from '../CloseBtn/CloseBtn';
 import {setSwapAsyncIsWaiting} from "../../store/actions/swap";
+import {setManageAsyncIsWaiting} from "../../store/actions/manage";
 
 function PoolConfirmPopup(props) {
   const dispatch = useDispatch();
@@ -27,26 +28,38 @@ function PoolConfirmPopup(props) {
 
       let poolStatus = await processLiquidity(curExt, pairId, fromValue * 1000000000, toValue * 1000000000);
       console.log("poolStatus",poolStatus)
+    if(!poolStatus || (poolStatus && (poolStatus.code === 1000))){
+      dispatch(setPoolAsyncIsWaiting(false))
+    }
 
-     if(poolStatus.code){
-       dispatch(setPoolAsyncIsWaiting(false))
-       switch (poolStatus.text) {
+    // if(poolStatus && poolStatus.code){
+    //   dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+    //   dispatch(setPoolAsyncIsWaiting(false))
+    // }
+    // if(!poolStatus.code){
+    //   dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+    // }
+    //  if(poolStatus.code){
+    //    dispatch(setPoolAsyncIsWaiting(false))
+       // switch (poolStatus.text) {
+       //
+       //   case 'Canceled by user.':
+       //     dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+       //     break;
+       //   case 'Rejected by user':
+       //     dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+       //     break;
+       //   default:
+       //     dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+       //     break;
+       //
+       // }
 
-         case 'Canceled by user.':
-           dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-           break;
-         case 'Rejected by user':
-           dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-           break;
-         default:
-           dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-           break;
-
-       }
      }
+
     // dispatch(setPoolAsyncIsWaiting(false))
 
-  }
+
 
   return (
     <div className="popup-wrapper confirm-popup">
