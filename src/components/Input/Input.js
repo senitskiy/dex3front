@@ -142,15 +142,15 @@ function Input(props) {
         </div>
         <div className="input-wrapper">
           <input
-              type="number"
-              className={props.value > 0 ? "input-field" : "input-field input-field--zero"}
-              value={props.value}
-              onChange={event => setValue(+event.target.value)}
-              onKeyPress={event => handleKeyPress(event)}
-              min="0"
-              autoFocus={props.autoFocus || false}
-              placeholder="0"
-              readOnly={props.readOnly}
+            type="number"
+            className={props.value > 0 ? "input-field" : "input-field input-field--zero"}
+            value={props.value}
+            onChange={event => setValue(parseFloat(props.token.balance).toFixed(4) < +event.target.value ? parseFloat(props.token.balance).toFixed(4) : +event.target.value)}
+            onKeyPress={event => handleKeyPress(event)}
+            min="0"
+            autoFocus={props.autoFocus || false}
+            placeholder="0"
+            readOnly={props.readOnly}
           />
 
           { !props.token.symbol ? (

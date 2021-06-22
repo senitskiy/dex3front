@@ -12,7 +12,7 @@ import {
     transferFromGiver
 } from "../webhook/script"
 
-//TonClient.useBinaryLibrary(libWeb);
+// TonClient.useBinaryLibrary(libWeb);
 
 const Radiance = require('../Radiance.json');
 
@@ -44,7 +44,6 @@ export async function setCreator(curExt) {
         try {
 
             const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
-
 
             let checkClientExists = await getRootCreators()
             if(checkClientExists.creators["0x"+pubkey]){
@@ -176,6 +175,7 @@ export async function transfer(SendTransfer,addressTo,amount) {
  */
 
 export async function swapA(curExt,pairAddr, qtyA) {
+    console.log("qtyA",qtyA)
     const {pubkey, contract, callMethod,SendTransfer} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){

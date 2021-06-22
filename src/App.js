@@ -3,7 +3,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {Switch, Route, Redirect, useLocation, useHistory} from 'react-router-dom';
 import {changeTheme, setCurExt, setExtensionsList, setWalletIsConnected, showPopup} from './store/actions/app';
 import {setLiquidityList, setPairsList, setPubKey, setSubscribeData, setTokenList, setTransactionsList, setWallet} from './store/actions/wallet';
-import { getAllClientWallets, getAllPairsWoithoutProvider, getClientBalance, subscribe } from './extensions/webhook/script';
+import { getAllClientWallets, getAllPairsWoithoutProvider, getClientBalance,checkPubKey, subscribe,checkClientPairExists } from './extensions/webhook/script';
 import { checkExtensions, getCurrentExtension } from './extensions/extensions/checkExtensions';
 import { setSwapAsyncIsWaiting, setSwapFromInputValue, setSwapFromToken, setSwapToInputValue, setSwapToToken } from './store/actions/swap';
 import { setPoolAsyncIsWaiting, setPoolFromInputValue, setPoolFromToken, setPoolToInputValue, setPoolToToken } from './store/actions/pool';
@@ -56,17 +56,41 @@ function App() {
     let curExtt = await getCurrentExtension(curExtname)
     dispatch(setCurExt(curExtt));
 
-    const wallet = localStorage.getItem('wallet') === null ? {} : JSON.parse(localStorage.getItem('wallet'));
+    console.log("curExtt",curExtt._extLib.pubkey)
+
+
+    const pubKey = localStorage.getItem('pubKey') === null ?
+        await checkPubKey(curExtt._extLib.pubkey)
+        :
+        JSON.parse(localStorage.getItem('pubKey'));
+
+    if(pubKey.status) dispatch(setPubKey(pubKey));
+
+
+    const wallet = localStorage.getItem('wallet') === null ?
+        {
+          id:pubKey.dexclient,
+          balance:await getClientBalance(pubKey.dexclient)
+        }
+        :
+        JSON.parse(localStorage.getItem('wallet'));
+
     if(wallet.id) {
       dispatch(setWallet(wallet));
       dispatch(setWalletIsConnected(true));
     }
     const pairs = await getAllPairsWoithoutProvider();
+
+    let arrPairs = [];
+    await pairs.map(async item=>{
+      item.exists = await checkClientPairExists(pubKey.dexclient, item.pairAddress)
+      arrPairs.push(item)
+    })
     dispatch(setPairsList(pairs));
 
-    const pubKey = localStorage.getItem('pubKey') === null ? {} : JSON.parse(localStorage.getItem('pubKey'));
 
-    if(pubKey.status) dispatch(setPubKey(pubKey));
+
+
 
     // const tokenList = getAllClientWallets(pubKey.address)
 
@@ -108,13 +132,14 @@ function App() {
   }, [swapAsyncIsWaiting, poolAsyncIsWaiting, manageAsyncIsWaiting]);
 
   useEffect(async () => {
-    if(subscribeData.dst) {
-      const clientBalance = await getClientBalance(pubKey.dexclient);
 
+    if(subscribeData.dst) {
+      const clientBalance = await getClientBalance(pubKey.address);
+console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey.address)
       let item = localStorage.getItem("currentElement");
       if(transactionsList[item]) transactionsList[item].toValue = subscribeData.amountOfTokens / 1e9;
       if (transactionsList.length) dispatch(setTransactionsList(transactionsList));
-      dispatch(setWallet({id: pubKey.dexclient, balance: clientBalance}));
+      dispatch(setWallet({id: pubKey.address, balance: clientBalance}));
       let tokenList = await getAllClientWallets(pubKey.address);
       let liquidityList = [];
       if(tokenList.length) {

@@ -256,7 +256,7 @@ export async function getAllPairsWoithoutProvider() {
  */
 
 export async function getClientBalance(clientAddress) {
-
+console.log("clientAddress",clientAddress)
     let address = clientAddress
     try {
         let clientBalance = await client.net.query_collection({
@@ -268,7 +268,7 @@ export async function getClientBalance(clientAddress) {
             },
             result: "balance",
         });
-
+        console.log("clientBalance",clientBalance)
         return +clientBalance.result[0].balance / 1000000000
     } catch (e) {
         console.log("catch E", e);
@@ -329,10 +329,15 @@ export async function subscribe(address) {
             if (decoded === 304) {decoded = await decode.message(SafeMultisigWallet.abi, params.result.boc)}
             if (decoded === 304) {decoded = await decode.message(DEXPairContract.abi, params.result.boc)}
             if (decoded === 304) {decoded = await decode.message(DEXclientContract.abi, params.result.boc)}
-            if(decoded.value.grams){
+
+            if(decoded.name === "accept"){
+                store.dispatch(setSubscribeData({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens}))
+                return
+            }
+console.log("decoded",decoded,"params",params)
+            if(decoded.value && decoded.value.grams){
                 return null
             }
-            console.log(params, responseType, {transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
             let caseID = await checkMessagesAmount({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
             if(caseID && caseID.dst) store.dispatch(setSubscribeData(caseID));
         }
@@ -373,6 +378,18 @@ export async function getAllDataPreparation(clientAddress) {
         console.log("catch E", e);
         return e
     }
+}
+
+export async function transferFromGiver(addr, count) {
+    const gSigner = signerKeys({
+        "public": "d7e584a9ef4d41de1060b95dc1cdfec6df60dd166abc684ae505a9ff48925a19",
+        "secret": "742bba3dab8eb0622ba0356acd3de4fd263b9f7290fdb719589f163f6468b699"
+    })
+
+    const curGiverContract = new Account(GContract, {address: "0:ed069a52b79f0bc21d13da9762a591e957ade1890d4a1c355e0010a8cb291ae4", signer: gSigner,client});
+    return await curGiverContract.run("pay", {
+        addr, count
+    });
 }
 
 

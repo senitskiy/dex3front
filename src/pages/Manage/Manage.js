@@ -57,22 +57,30 @@ console.log("pair", pairId)
       console.log("NUMMMM",Number(((balance.toFixed() * rangeValue) / 100) * 1000000000))
       let returnStatus = await returnLiquidity(curExt, pairId, ((balance.toFixed() * rangeValue) / 100) * 1000000000);
 
-    if(returnStatus.code) {
-      dispatch(setPoolAsyncIsWaiting(false))
-      switch (returnStatus.text) {
-        case 'Canceled by user.':
-          dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-          break;
-        case 'Rejected by user':
-          dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-          break;
-        default:
-          dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-          break;
-      }
+      console.log("returnStatus",returnStatus)
+    if(!returnStatus || (returnStatus && (returnStatus.code === 1000))){
+      dispatch(setManageAsyncIsWaiting(false))
     }
-      // dispatch(setManageAsyncIsWaiting(false));
+      // dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+      // dispatch(setPoolAsyncIsWaiting(false))
 
+    // if(returnStatus && returnStatus.code) {
+      // dispatch(setPoolAsyncIsWaiting(false))
+      // switch (returnStatus.text) {
+      //   case 'Canceled by user.':
+      //     dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+      //     break;
+      //   case 'Rejected by user':
+      //     dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+      //     break;
+      //   default:
+      //     dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+      //     break;
+      // }
+    // }
+    // if(returnStatus && !returnStatus.code) {
+    //   dispatch(setManageAsyncIsWaiting(false));
+    // }
   }
 
   return(
