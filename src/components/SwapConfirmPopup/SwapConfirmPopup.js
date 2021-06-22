@@ -198,10 +198,10 @@ function SwapConfirmPopup(props) {
                   </defs>
                 </svg>
               }
-              <span className="confirm-value"><img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol}/>{parseFloat(toValue.toFixed(4))}</span>
+              <span className="confirm-value"><img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol}/>{toValue < 0.0001 ? parseFloat(toValue.toFixed(8)) : parseFloat(toValue.toFixed(4))}</span>
             </div>
             <p className="confirm-text">
-              Output is estimated. You will receive at least <span>{parseFloat(toValue.toFixed(4))} {toToken.symbol}</span> or the transaction will revert
+              Output is estimated. You will receive at least <span>{toValue < 0.0001 ? parseFloat(toValue.toFixed(8)) : parseFloat(toValue.toFixed(4))} {toToken.symbol}</span> or the transaction will revert
             </p>
             <button className="btn popup-btn" onClick={() => handleSwap()}>Confirm Swap</button>
           </>
@@ -211,7 +211,7 @@ function SwapConfirmPopup(props) {
             <div className="mainblock-footer-wrap">
               {/*<div>*/}
                 <div className="swap-confirm-wrap">
-                  <p className="mainblock-footer-value"><img src={miniSwap} alt=""/> {parseFloat(rate.toFixed(4))} {toToken.symbol}/{fromToken.symbol}</p>
+                  <p className="mainblock-footer-value"><img src={miniSwap} alt=""/> {rate < 0.0001 ? parseFloat(rate.toFixed(8)) : parseFloat(rate.toFixed(4))} {toToken.symbol}/{fromToken.symbol}</p>
                   <p className="mainblock-footer-subtitle">Price</p>
                 </div>
                 <div className="swap-confirm-wrap">

@@ -1,4 +1,16 @@
+import {DEXrootContract} from "../contracts/DEXRoot.js";
+import {DEXclientContract} from "../contracts/DEXClient.js";
+import {GContract} from "../contracts/GContract.js";
+import {TONTokenWalletContract} from "../contracts/TONTokenWallet.js";
+import {RootTokenContract} from "../contracts/RootTokenContract.js";
+import {SafeMultisigWallet} from "../msig/SafeMultisigWallet.js";
+import {DEXPairContract} from "../contracts/DEXPairContract.js";
+import {abiContract, signerKeys} from "@tonclient/core";
+// import {getWalletBalance} from "../sdk/run";
 import {libWeb} from "@tonclient/lib-web";
+import {store} from '../../index'
+import {setSubscribeData} from '../../store/actions/wallet'
+
 const { ResponseType } = require("@tonclient/core/dist/bin");
 const {
     MessageBodyType,
@@ -10,19 +22,6 @@ const DappServer = "net.ton.dev"
 const client = new TonClient({ network: { endpoints: [DappServer] } });
 
 const Radiance = require('../Radiance.json');
-import {DEXrootContract} from "../contracts/DEXRoot.js";
-import {DEXclientContract} from "../contracts/DEXClient.js";
-import {GContract} from "../contracts/GContract.js";
-import {TONTokenWalletContract} from "../contracts/TONTokenWallet.js";
-import {RootTokenContract} from "../contracts/RootTokenContract.js";
-import {SafeMultisigWallet} from "../msig/SafeMultisigWallet.js";
-import {DEXPairContract} from "../contracts/DEXPairContract.js";
-import {abiContract, signerKeys, signerSigningBox} from "@tonclient/core";
-// import {getWalletBalance} from "../sdk/run";
-import {checkExtensions, getCurrentExtension} from "../extensions/checkExtensions";
-
-import {store} from '../../index'
-import {setSubscribeData} from '../../store/actions/wallet'
 
 function hex2a(hex) {
     let str = '';
@@ -36,7 +35,17 @@ function getShardThis(string) {
     return string[2];
 }
 
+export async function transferFromGiver(addr, count) {
+    const gSigner = signerKeys({
+        "public": "d7e584a9ef4d41de1060b95dc1cdfec6df60dd166abc684ae505a9ff48925a19",
+        "secret": "742bba3dab8eb0622ba0356acd3de4fd263b9f7290fdb719589f163f6468b699"
+    })
 
+    const curGiverContract = new Account(GContract, {address: "0:ed069a52b79f0bc21d13da9762a591e957ade1890d4a1c355e0010a8cb291ae4", signer: gSigner,client});
+    return await curGiverContract.run("pay", {
+        addr, count
+    });
+}
 
 export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAddress) {
     let connectorSoArg0;
@@ -79,8 +88,8 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
 export async function getRootCreators() {
     // try {
     const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
-        let RootCreators = await RootContract.runLocal("creators", {})
-        return RootCreators.decoded.output
+    let RootCreators = await RootContract.runLocal("creators", {})
+    return RootCreators.decoded.output
     // } catch (e) {
     //     console.log("catch E", e);
     //     return e
@@ -329,7 +338,6 @@ console.log("decoded",decoded,"params",params)
             if(decoded.value && decoded.value.grams){
                 return null
             }
-
             let caseID = await checkMessagesAmount({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
             if(caseID && caseID.dst) store.dispatch(setSubscribeData(caseID));
         }
@@ -386,10 +394,10 @@ export async function transferFromGiver(addr, count) {
 
 
 const secretKeys = {
-"0:8ed631b2691e55ddc65065e0475d82a0b776307797b31a2683a3af7b5c26b984": {"public":"0ce403a4a20165155788f0517d1a455b4f1e82899f3782fadcf07413b2a56730","secret":"e91e2e4e61d35d882a478bb21f77184b9aca6f93faedf6ed24be9e9bf032ef55"},
-"0:d214d4779f63e062569a39d414a98c9891cf5e97cc790a3e6c62ce5fd0a5e1c9": {"public":"cdc97359b239a115d61364526052da837a85d396fa7cca76da015942657c9fad","secret":"f5a05c6211db62ff076fb25a7c349033123f2a0b9aea97b673f2b83e378b3824"},
-"0:32354f00d4f7c6adea7da52e9300a5aa0321523a85c8e759ccea947578ace4c3": {"public":"04a88959a0b1b1655894343714ce7bc7c516c8195407ab6c8de8b64c92e7f172","secret":"cd69d372dacd5f8fd0f8e6db120205bb128507df76b02064f6d01d90e8e3be04"},
-"0:c58d18098ddc6a469308e41555699384f5f2dc83ff3d55cb61a3bdabcb9d3b01": {"public":"f574ac4095a3d3d8b267e4300bac4825ece723ed2569238a860149b683201a5c","secret":"96975ca89e99116a97a4850f0cc962e8d2630a80e4568d76b8e2f94a7addf312"}
+    "0:8ed631b2691e55ddc65065e0475d82a0b776307797b31a2683a3af7b5c26b984": {"public":"0ce403a4a20165155788f0517d1a455b4f1e82899f3782fadcf07413b2a56730","secret":"e91e2e4e61d35d882a478bb21f77184b9aca6f93faedf6ed24be9e9bf032ef55"},
+    "0:d214d4779f63e062569a39d414a98c9891cf5e97cc790a3e6c62ce5fd0a5e1c9": {"public":"cdc97359b239a115d61364526052da837a85d396fa7cca76da015942657c9fad","secret":"f5a05c6211db62ff076fb25a7c349033123f2a0b9aea97b673f2b83e378b3824"},
+    "0:32354f00d4f7c6adea7da52e9300a5aa0321523a85c8e759ccea947578ace4c3": {"public":"04a88959a0b1b1655894343714ce7bc7c516c8195407ab6c8de8b64c92e7f172","secret":"cd69d372dacd5f8fd0f8e6db120205bb128507df76b02064f6d01d90e8e3be04"},
+    "0:c58d18098ddc6a469308e41555699384f5f2dc83ff3d55cb61a3bdabcb9d3b01": {"public":"f574ac4095a3d3d8b267e4300bac4825ece723ed2569238a860149b683201a5c","secret":"96975ca89e99116a97a4850f0cc962e8d2630a80e4568d76b8e2f94a7addf312"}
 };
 
 export async function mintTokens(walletAddress, clientAddress) {

@@ -121,22 +121,22 @@ console.log("pair", pairId)
                 />
                 <p className="manage-subtitle">Amount</p>
                 <div className="manage-token-wrapper">
-                  <div className="manage-token-balance">{parseFloat(qtyA.toFixed(4))}</div>
+                  <div className="manage-token-balance">{qtyA < 0.0001 ? parseFloat(qtyA.toFixed(8)) : parseFloat(qtyA.toFixed(4))}</div>
                   <div className="manage-token-symbol">
                     <img src={iconGenerator(fromToken.symbol)} alt={fromToken.symbol} />
                     {fromToken.symbol}
                   </div>
                 </div>
                 <div className="manage-token-wrapper">
-                  <div className="manage-token-balance">{parseFloat(qtyB.toFixed(4))}</div>
+                  <div className="manage-token-balance">{qtyB < 0.0001 ? parseFloat(qtyB.toFixed(8)) : parseFloat(qtyB.toFixed(4))}</div>
                   <div className="manage-token-symbol">
                     <img src={iconGenerator(toToken.symbol)} alt={toToken.symbol} />
                     {toToken.symbol}
                   </div>
                 </div>
                 <p className="manage-subtitle">Price</p>
-                <p className="manage-text">1 {fromToken.symbol} = {parseFloat(rateAB.toFixed(4))} {toToken.symbol}</p>
-                <p className="manage-text">1 {toToken.symbol} = {parseFloat(rateBA.toFixed(4))} {fromToken.symbol}</p>
+                <p className="manage-text">1 {fromToken.symbol} = {rateAB < 0.0001 ? parseFloat(rateAB.toFixed(8)) : parseFloat(rateAB.toFixed(4))} {toToken.symbol}</p>
+                <p className="manage-text">1 {toToken.symbol} = {rateBA < 0.0001 ? parseFloat(rateBA.toFixed(8)) : parseFloat(rateBA.toFixed(4))} {fromToken.symbol}</p>
                 <button onClick={handleRemove} className={rangeValue !== 0 ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"}>Remove</button>
               </div>
             }
@@ -144,7 +144,7 @@ console.log("pair", pairId)
         )}
       </>}
 
-      { manageAsyncIsWaiting && <WaitingPopup text={`Removing ${parseFloat(qtyA.toFixed(4))} ${fromToken.symbol} and ${parseFloat(qtyB.toFixed(4))} ${toToken.symbol}`} /> }
+      { manageAsyncIsWaiting && <WaitingPopup text={`Removing ${qtyA < 0.0001 ? parseFloat(qtyA.toFixed(8)) : parseFloat(qtyA.toFixed(4))} ${fromToken.symbol} and ${qtyB < 0.0001 ? parseFloat(qtyB.toFixed(8)) : parseFloat(qtyB.toFixed(4))}} ${toToken.symbol}`} /> }
     </div>
   )
 }

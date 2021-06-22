@@ -70,7 +70,7 @@ function Item(props) {
             </div>
           </div>
           <div>
-            { walletIsConnected && <span style={{marginRight: "10px"}} className="select-item-balance">{isVisibleFaucet && "Your tokens are comming!"} {!isVisibleFaucet && (props.balance > 0 ? parseFloat(props.balance.toFixed(4)) : props.balance)}</span> }
+            { walletIsConnected && <span style={{marginRight: "10px"}} className="select-item-balance">{isVisibleFaucet && "Your tokens are comming!"} {!isVisibleFaucet && (props.balance < 0.0001 ? parseFloat(props.balance.toFixed(8)) : parseFloat(props.balance.toFixed(4)))}</span> }
             {props.lp===false &&
 
             <button className="btn input-btn" onClick={faucet}>

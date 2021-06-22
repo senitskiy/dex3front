@@ -157,6 +157,8 @@ function AddLiquidity () {
     //console.log("totalSup",totalSup)
     return +percOfTotal
   }
+
+  let totalLP = getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000
   return (
     <div className="container">
       { !poolAsyncIsWaiting && (
@@ -195,18 +197,19 @@ function AddLiquidity () {
                     <div className="add-liquidity-wrapper">
 
                       <div>
-                        <span>{(getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000).toFixed(4)}</span>
+                        <span>{
+                          (getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000) < 0.0001 ? (getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000).toFixed(8) : (getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000).toFixed(4)}</span>
                         You will receive LP tokens
                       </div>
 
 
                       <div>
-                        <span>{parseFloat(rateBA.toFixed(4))}</span>
+                        <span>{rateBA < 0.0001 ? parseFloat(rateBA.toFixed(8)) : parseFloat(rateBA.toFixed(4)) }</span>
                         {fromTokenSymbol} per 1 {toTokenSymbol}
                       </div>
 
                       <div>
-                        <span>{parseFloat(rateAB.toFixed(4))}</span>
+                        <span>{rateAB < 0.0001 ? parseFloat(rateAB.toFixed(8)) : parseFloat(rateAB.toFixed(4)) }</span>
                         {toTokenSymbol} per 1 {fromTokenSymbol}
                       </div>
 
@@ -215,7 +218,7 @@ function AddLiquidity () {
 
                 <div className="add-liquidity-wrapper">
                   <div>
-                    <span>{`${(mixPercentValue(fromValue, ratesData.totalSupply)).toFixed(4)} %`}</span>
+                    <span>{`${mixPercentValue(fromValue, ratesData.totalSupply) < 0.0001 ? (mixPercentValue(fromValue, ratesData.totalSupply)).toFixed(8) : (mixPercentValue(fromValue, ratesData.totalSupply)).toFixed(4) } %`}</span>
                     Your share of pool
                   </div>
                   <div>
@@ -246,7 +249,8 @@ function AddLiquidity () {
           hideConfirmPopup={setPoolConfirmPopupIsVisible.bind(this, false)}
           rateAB={rateAB}
           rateBA={rateBA}
-          lpAmount={(getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000).toFixed(4)}
+          lpAmount={
+            totalLP < 0.0001 ? totalLP.toFixed(8) : totalLP.toFixed(4)}
         /> }
 
       { poolAsyncIsWaiting && <WaitingPopup text={`Supplying ${fromValue} ${fromToken.symbol} and ${toValue} ${toToken.symbol}`} /> }
