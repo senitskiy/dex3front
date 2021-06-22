@@ -128,7 +128,7 @@ function Input(props) {
             type="number"
             className={props.value > 0 ? "input-field" : "input-field input-field--zero"}
             value={props.value}
-            onChange={event => setValue(+event.target.value)}
+            onChange={event => setValue(parseFloat(props.token.balance).toFixed(4) < +event.target.value ? parseFloat(props.token.balance).toFixed(4) : +event.target.value)}
             onKeyPress={event => handleKeyPress(event)}
             min="0"
             autoFocus={props.autoFocus || false}

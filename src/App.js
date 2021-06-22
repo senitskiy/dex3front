@@ -3,7 +3,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {Switch, Route, Redirect, useLocation, useHistory} from 'react-router-dom';
 import {changeTheme, setCurExt, setExtensionsList, setWalletIsConnected, showPopup} from './store/actions/app';
 import {setLiquidityList, setPairsList, setPubKey, setSubscribeData, setTokenList, setTransactionsList, setWallet} from './store/actions/wallet';
-import { getAllClientWallets, getAllPairsWoithoutProvider, getClientBalance,checkPubKey, subscribe } from './extensions/webhook/script';
+import { getAllClientWallets, getAllPairsWoithoutProvider, getClientBalance,checkPubKey, subscribe,checkClientPairExists } from './extensions/webhook/script';
 import { checkExtensions, getCurrentExtension } from './extensions/extensions/checkExtensions';
 import { setSwapAsyncIsWaiting, setSwapFromInputValue, setSwapFromToken, setSwapToInputValue, setSwapToToken } from './store/actions/swap';
 import { setPoolAsyncIsWaiting, setPoolFromInputValue, setPoolFromToken, setPoolToInputValue, setPoolToToken } from './store/actions/pool';
@@ -80,6 +80,12 @@ function App() {
       dispatch(setWalletIsConnected(true));
     }
     const pairs = await getAllPairsWoithoutProvider();
+
+    let arrPairs = [];
+    await pairs.map(async item=>{
+      item.exists = await checkClientPairExists(pubKey.dexclient, item.pairAddress)
+      arrPairs.push(item)
+    })
     dispatch(setPairsList(pairs));
 
 

@@ -13,7 +13,7 @@ import {
     getClientBalance
 } from "../webhook/script"
 
-TonClient.useBinaryLibrary(libWeb);
+// TonClient.useBinaryLibrary(libWeb);
 
 const Radiance = require('../Radiance.json');
 
@@ -44,7 +44,6 @@ export async function setCreator(curExt) {
         try {
 
             const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
-
 
             let checkClientExists = await getRootCreators()
             if(checkClientExists.creators["0x"+pubkey]){
@@ -176,6 +175,7 @@ export async function transfer(SendTransfer,addressTo,amount) {
  */
 
 export async function swapA(curExt,pairAddr, qtyA) {
+    console.log("qtyA",qtyA)
     const {pubkey, contract, callMethod,SendTransfer} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){
@@ -207,10 +207,11 @@ export async function swapB(curExt,pairAddr, qtyB) {
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
-    let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
-    if(500000000 > (checkClientBalance*1000000000)){
-        await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
-    }
+
+    // let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
+    // if(500000000 > (checkClientBalance*1000000000)){
+    //     await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
+    // }
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         const processSwapA = await callMethod("processSwapB", {pairAddr:pairAddr, qtyB:qtyB}, clientContract)

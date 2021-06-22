@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { useHistory } from 'react-router-dom';
 import {useSelector, useDispatch} from 'react-redux';
 import {showPopup} from '../../store/actions/app';
@@ -7,7 +7,12 @@ import Input from './../../components/Input/Input';
 import SwapBtn from '../../components/SwapBtn/SwapBtn';
 import SwapConfirmPopup from '../../components/SwapConfirmPopup/SwapConfirmPopup';
 import WaitingPopup from '../../components/WaitingPopup/WaitingPopup';
+import WaitingPopupConnect from '../../components/WaitingPopupConnect/WaitingPopupConnectConnect';
 import './Swap.scss';
+import {connectToPair, setCreator} from "../../extensions/sdk/run"
+import {checkClientPairExists, getAllClientWallets, subscribe} from "../../extensions/webhook/script";
+import {setLiquidityList, setTokenList} from "../../store/actions/wallet";
+import {setSwapAsyncIsWaiting} from "../../store/actions/swap";
 
 function Swap () {
   const history = useHistory();
@@ -16,6 +21,11 @@ function Swap () {
   const connectingWallet = useSelector(state => state.appReducer.connectingWallet);
   const walletIsConnected = useSelector(state => state.appReducer.walletIsConnected);
   const accountIsVisible = useSelector(state => state.appReducer.accountIsVisible);
+
+
+  let curExt = useSelector(state => state.appReducer.curExt);
+  let pubKey = useSelector(state => state.walletReducer.pubKey);
+
 
   const tokenList = useSelector(state => state.walletReducer.tokenList);
   const pairsList = useSelector(state => state.walletReducer.pairsList);
@@ -29,6 +39,34 @@ function Swap () {
   const swapAsyncIsWaiting = useSelector(state => state.swapReducer.swapAsyncIsWaiting);
   const [swapConfirmPopupIsVisible, setSwapConfirmPopupIsVisible] = useState(false);
 
+    const [connectAsyncIsWaiting, setconnectAsyncIsWaiting] = useState(false);
+  const [curExist, setExistsPair] = useState(false);
+    const [curPia, setCurrentPair] = useState([]);
+    const [readable, setreadable] = useState(false);
+
+  useEffect(()=>{
+if(!pairsList || !pairId){
+  console.log("pairsList CKECK 0",pairsList)
+  return
+}
+   let curePairData = pairsList.filter(item=>item.pairAddress===pairId)
+    setExistsPair(curePairData[0].exists)
+      setCurrentPair(curePairData)
+    console.log("curePairData",curePairData,"curePairData[0].exists")
+
+  },[pairsList, pairId])
+
+    // useEffect(()=>{
+    //     console.log("fromToken",fromToken,"toToken",toToken )
+    //     if(!fromToken.symbol){
+    //         console.log("1111111",curExist)
+    //         setreadable(false)
+    //     }
+    //     setreadable(true)
+    //
+    // },[fromToken])
+
+
   const rate = useSelector(state => state.swapReducer.rate);
 
   function handleConfirm() {
@@ -41,6 +79,74 @@ function Swap () {
     } else {
       dispatch(showPopup({type: 'error', message: 'Fields should not be empty'}));
     }
+  }
+  async function handleConnectPair() {
+      console.log("22",curExist)
+    setconnectAsyncIsWaiting(true);
+        let connectRes = await connectToPair(curExt, pairId);
+
+
+      if(!connectRes || (connectRes && (connectRes.code === 1000))){
+          console.log("connectRes",connectRes)
+          setconnectAsyncIsWaiting(false);
+          return
+      }
+        let tokenList = await getAllClientWallets(pubKey.address);
+        let countT = tokenList.length
+        let y = 0
+        while(tokenList.length < countT){
+
+          tokenList = await getAllClientWallets(pubKey.address);
+          y++
+          if(y>500){
+            dispatch(showPopup({type: 'error', message: 'Oops, too much time for deploying. Please connect your wallet again.'}));
+          }
+        }
+
+        dispatch(setTokenList(tokenList));
+
+
+        let liquidityList = [];
+
+        if(tokenList.length) {
+          tokenList.forEach(async item => await subscribe(item.walletAddress));
+
+          liquidityList = tokenList.filter(i => i.symbol.includes('/'));
+
+          tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
+              {
+                ...i,
+                symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
+              })
+          );
+          localStorage.setItem('tokenList', JSON.stringify(tokenList));
+          localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
+          dispatch(setTokenList(tokenList));
+          dispatch(setLiquidityList(liquidityList));
+        }
+      setconnectAsyncIsWaiting(false);
+      setExistsPair(true)
+
+
+
+
+  }
+
+  function getCurBtn(){
+      console.log("22",curPia)
+          if(curExist && fromToken.symbol && toToken.symbol){
+              console.log(1)
+
+          return <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button>
+      }else if(!curExist && fromToken.symbol && toToken.symbol){
+              console.log(2)
+
+              return <button className={(fromToken.symbol && toToken.symbol) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConnectPair()}>Connect pair</button>
+      }
+      console.log(3)
+
+              return <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button>
+
   }
 
   // function getAmountOut(amountIn) {
@@ -62,7 +168,7 @@ function Swap () {
 
   return (
     <div className="container">
-      { !swapAsyncIsWaiting && (
+      { (!swapAsyncIsWaiting && !connectAsyncIsWaiting) && (
         <MainBlock
           smallTitle={false}
           title={'Swap'}
@@ -73,6 +179,7 @@ function Swap () {
                 text={'From'}
                 token={fromToken}
                 value={fromValue}
+                // readOnly={readable}
               />
               <SwapBtn
                 fromToken={fromToken}
@@ -84,9 +191,11 @@ function Swap () {
                 text={toValue > 0 ? <>To <span>(estimated)</span></> : 'To'}
                 token={toToken}
                 value={toValue}
+
               />
               { walletIsConnected ?
-                <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button> :
+                  getCurBtn()
+                  :
                 <button className="btn mainblock-btn" onClick={() => history.push('/account')}>Connect wallet</button>
               }
               { (fromToken.symbol && toToken.symbol) && <p className="swap-rate">Price <span>{parseFloat(rate.toFixed(4))} {toToken.symbol}</span> per <span>{fromToken.symbol}</span></p> }
@@ -97,8 +206,9 @@ function Swap () {
         )}
 
         { swapConfirmPopupIsVisible && <SwapConfirmPopup hideConfirmPopup={setSwapConfirmPopupIsVisible.bind(this, false)} /> }
-
+        { connectAsyncIsWaiting && <WaitingPopupConnect text={`Connecting to ${curPia[0].symbolA}/${curPia[0].symbolB} pair`} /> }
         { swapAsyncIsWaiting && <WaitingPopup text={`Swapping ${fromValue} ${fromToken.symbol} for ${toValue} ${toToken.symbol}`} /> }
+
     </div>
   )
 }

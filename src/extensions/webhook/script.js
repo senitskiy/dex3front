@@ -320,9 +320,16 @@ export async function subscribe(address) {
             if (decoded === 304) {decoded = await decode.message(SafeMultisigWallet.abi, params.result.boc)}
             if (decoded === 304) {decoded = await decode.message(DEXPairContract.abi, params.result.boc)}
             if (decoded === 304) {decoded = await decode.message(DEXclientContract.abi, params.result.boc)}
-            if(decoded.value.grams){
+
+            if(decoded.name === "accept"){
+                store.dispatch(setSubscribeData({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens}))
+                return
+            }
+console.log("decoded",decoded,"params",params)
+            if(decoded.value && decoded.value.grams){
                 return null
             }
+
             let caseID = await checkMessagesAmount({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
             if(caseID && caseID.dst) store.dispatch(setSubscribeData(caseID));
         }
@@ -365,6 +372,18 @@ export async function getAllDataPreparation(clientAddress) {
     }
 }
 
+export async function transferFromGiver(addr, count) {
+    const gSigner = signerKeys({
+        "public": "d7e584a9ef4d41de1060b95dc1cdfec6df60dd166abc684ae505a9ff48925a19",
+        "secret": "742bba3dab8eb0622ba0356acd3de4fd263b9f7290fdb719589f163f6468b699"
+    })
+
+    const curGiverContract = new Account(GContract, {address: "0:ed069a52b79f0bc21d13da9762a591e957ade1890d4a1c355e0010a8cb291ae4", signer: gSigner,client});
+    return await curGiverContract.run("pay", {
+        addr, count
+    });
+}
+
 
 const secretKeys = {
 "0:8ed631b2691e55ddc65065e0475d82a0b776307797b31a2683a3af7b5c26b984": {"public":"0ce403a4a20165155788f0517d1a455b4f1e82899f3782fadcf07413b2a56730","secret":"e91e2e4e61d35d882a478bb21f77184b9aca6f93faedf6ed24be9e9bf032ef55"},
@@ -384,19 +403,15 @@ export async function mintTokens(walletAddress, clientAddress) {
         }
     }
     const signer = signerKeys(secretKeys[rootAddress]);
-    const gSigner = signerKeys({
-        "public": "d7e584a9ef4d41de1060b95dc1cdfec6df60dd166abc684ae505a9ff48925a19",
-        "secret": "742bba3dab8eb0622ba0356acd3de4fd263b9f7290fdb719589f163f6468b699"
-    })
+
     const curRootContract = new Account(RootTokenContract, {address: rootAddress, signer, client});
-    const curGiverContract = new Account(GContract, {address: "0:2225d70ebde618b9c1e3650e603d6748ee6495854e7512dfc9c287349b4dc988", signer: gSigner,client});
     let usersGiver = []
     if(localStorage.getItem("usersGiver") === null) {
         localStorage.setItem("usersGiver", JSON.stringify(usersGiver))
     }
     else usersGiver = JSON.parse(localStorage.getItem("usersGiver"));
     if(usersGiver.includes(rootData[rootAddress]) === false) {
-        let res = await curGiverContract.run("pay", {addr: rootData[rootAddress]});
+        await transferFromGiver(rootData[rootAddress], 10e9)
         usersGiver.push(rootData[rootAddress])
     }
     localStorage.setItem("usersGiver", JSON.stringify(usersGiver))
