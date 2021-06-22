@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { hidePopup, showPopup } from '../../store/actions/app';
@@ -92,12 +92,24 @@ function Input(props) {
     if(location.pathname.includes('swap')) {
       if(props.type === 'from') {
         if(props.token.balance && value > props.token.balance) {
-          dispatch(setSwapFromInputValue(Number(props.token.balance).toFixed(4)));
-          dispatch(setSwapToInputValue(parseFloat((Number(props.token.balance) * swapRate).toFixed(4))));
+          let val = Number(props.token.balance) * swapRate;
+          let val1 = 0;
+          if(val < 0.0001) val1 = parseFloat(val.toFixed(8))
+          else val1 = parseFloat(val.toFixed(4))
+
+          let val2 = Number(props.token.balance)
+          if(val2 < 0.0001) val2 = parseFloat(Number(props.token.balance).toFixed(8))
+          else val2 = parseFloat(Number(props.token.balance).toFixed(4))
+          dispatch(setSwapFromInputValue(val2));
+          dispatch(setSwapToInputValue(val));
         }
         else  {
           dispatch(setSwapFromInputValue(value));
-          dispatch(setSwapToInputValue(parseFloat((value * swapRate).toFixed(4))));
+          let val = value * swapRate;
+          let val1 = 0;
+          if(val < 0.0001) val1 = parseFloat(val.toFixed(8))
+          else val1 = parseFloat(val.toFixed(4))
+          dispatch(setSwapToInputValue(val1));
         }
 
       // } else if(props.type === 'to') {
@@ -107,11 +119,14 @@ function Input(props) {
     } else if(location.pathname.includes('add-liquidity')) {
       if(props.type === 'from') {
         dispatch(setPoolFromInputValue(value));
-        dispatch(setPoolToInputValue(parseFloat((value * poolRate).toFixed(4))));
+        let val = value * poolRate;
+        let val1 = 0;
+        if(val < 0.0001) val1 = parseFloat(val.toFixed(8))
+        else val1 = parseFloat(val.toFixed(4))
+        dispatch(setPoolToInputValue(val1));
       }
     }
   }
-
   function handleKeyPress(event) {
     if(event.key === '-' || event.key === '+') { event.preventDefault() }
   }
@@ -121,19 +136,21 @@ function Input(props) {
       <div className="input">
         <div className="input-wrapper">
           <span className="input-title">{props.text}</span>
-          <span className="input-balance">{(walletIsConnected && props.token.symbol) && `Balance: ${props.token.balance > 0 ? parseFloat(props.token.balance.toFixed(4)) : props.token.balance}`}</span>
+          <span className="input-balance">{(walletIsConnected && props.token.symbol) && `Balance: ${
+            props.token.balance < 0.0001 ? parseFloat(props.token.balance.toFixed(8)) : parseFloat(props.token.balance.toFixed(4))}
+            `}</span>
         </div>
         <div className="input-wrapper">
           <input
-            type="number"
-            className={props.value > 0 ? "input-field" : "input-field input-field--zero"}
-            value={props.value}
-            onChange={event => setValue(+event.target.value)}
-            onKeyPress={event => handleKeyPress(event)}
-            min="0"
-            autoFocus={props.autoFocus || false}
-            placeholder="0"
-            readOnly={props.readOnly}
+              type="number"
+              className={props.value > 0 ? "input-field" : "input-field input-field--zero"}
+              value={props.value}
+              onChange={event => setValue(+event.target.value)}
+              onKeyPress={event => handleKeyPress(event)}
+              min="0"
+              autoFocus={props.autoFocus || false}
+              placeholder="0"
+              readOnly={props.readOnly}
           />
 
           { !props.token.symbol ? (

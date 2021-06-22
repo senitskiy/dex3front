@@ -1,5 +1,3 @@
-import {TonClient} from "@tonclient/core";
-import {libWeb} from "@tonclient/lib-web";
 import {Account} from "@tonclient/appkit";
 import {checkExtensions, getCurrentExtension} from "../extensions/checkExtensions";
 import {DEXrootContract} from "../contracts/DEXRoot.js";
@@ -10,10 +8,11 @@ import {
     getRootCreators,
     getShardConnectPairQUERY,
     checkPubKey,
-    getClientBalance
+    getClientBalance,
+    transferFromGiver
 } from "../webhook/script"
 
-TonClient.useBinaryLibrary(libWeb);
+//TonClient.useBinaryLibrary(libWeb);
 
 const Radiance = require('../Radiance.json');
 
@@ -25,6 +24,7 @@ function UserException(message) {
 function getShard(string) {
     return string[2];
 }
+
 
 
 /**
@@ -104,7 +104,7 @@ export async function onSharding(curExt) {
                 status = true;
                 clientAddress = clientAddr;
                 // console.log({address: clientAddr, keys: pubkey, clientSoArg: n})
-               return await createDEXclient(curExt, {address: clientAddr, keys: '0x'+pubkey, clientSoArg: n}).catch(e=>console.log(e))
+                return await createDEXclient(curExt, {address: clientAddr, keys: '0x'+pubkey, clientSoArg: n}).catch(e=>console.log(e))
                 // return {address: clientAddr, keys: pubkey, clientSoArg: n}
             } else {console.log(n);}
             n++;
@@ -131,13 +131,13 @@ export async function createDEXclient(curExt, shardData) {
             pubkey: shardData.keys,
             souint: shardData.clientSoArg
         }, rootContract).catch(e => {
-            let ecode = '106';
-            let found = e.text.match(ecode);
-            if(found){
-                return new UserException("y are not registered at dex root, pls transfer some funds to dex root address")
-            }else{
-                return e
-            }
+                let ecode = '106';
+                let found = e.text.match(ecode);
+                if(found){
+                    return new UserException("y are not registered at dex root, pls transfer some funds to dex root address")
+                }else{
+                    return e
+                }
             }
         )
 
@@ -181,10 +181,7 @@ export async function swapA(curExt,pairAddr, qtyA) {
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
-    let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
-    if(500000000 > (checkClientBalance*1000000000)){
-        await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
-    }
+    await transferFromGiver(getClientAddressFromRoot.dexclient, 300000000)
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         const processSwapA = await callMethod("processSwapA", {pairAddr:pairAddr, qtyA:qtyA}, clientContract)
@@ -207,10 +204,7 @@ export async function swapB(curExt,pairAddr, qtyB) {
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
-    let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
-    if(500000000 > (checkClientBalance*1000000000)){
-        await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
-    }
+    await transferFromGiver(getClientAddressFromRoot.dexclient, 300000000)
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         const processSwapA = await callMethod("processSwapB", {pairAddr:pairAddr, qtyB:qtyB}, clientContract)
@@ -237,10 +231,7 @@ export async function returnLiquidity(curExt,pairAddr, tokens) {
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
-    let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
-    if(500000000 > (checkClientBalance*1000000000)){
-        await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
-    }
+    await transferFromGiver(getClientAddressFromRoot.dexclient, 300000000)
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         const returnLiquidity = await callMethod("returnLiquidity", {pairAddr:pairAddr, tokens: tokens}, clientContract)
@@ -267,10 +258,7 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
-    let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
-    if(500000000 > (checkClientBalance*1000000000)){
-        await transfer(SendTransfer,getClientAddressFromRoot.dexclient,3000000000)
-    }
+    await transferFromGiver(getClientAddressFromRoot.dexclient, 300000000)
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         const processLiquidity = await callMethod("processLiquidity", {pairAddr:pairAddr, qtyA:Number(qtyA).toFixed(0), qtyB:Number(qtyB).toFixed(0)}, clientContract)
@@ -296,10 +284,7 @@ export async function connectToPair(curExt,pairAddr) {
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
-    let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
-    if(6000000000 > (checkClientBalance*1000000000)){
-        await transfer(SendTransfer,getClientAddressFromRoot.dexclient,8000000000)
-    }
+    await transferFromGiver(getClientAddressFromRoot.dexclient, 5e9)
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         await callMethod("connectPair", {pairAddr: pairAddr}, clientContract)
@@ -356,7 +341,7 @@ export async function connectToPairStep2DeployWallets(connectionData) {
             await callMethod("connectRoot", {root: item, souint:soUint,gramsToConnector:500000000,gramsToRoot:1500000000}, clientContract)
             amountOfWallets++
         }
-    return {status:"success",amountOfWallets:amountOfWallets}
+        return {status:"success",amountOfWallets:amountOfWallets}
         // )
     }catch (e) {
         console.log("this",e)

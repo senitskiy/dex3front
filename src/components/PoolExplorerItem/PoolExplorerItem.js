@@ -36,13 +36,13 @@ function PoolExplorerItem(props) {
           <div className="poolExplorer__pair_rate">
             <div className="poolExplorer__reserve">
               <span className="select-item-descr"><div>
-                1 {props.pair.symbolA} = <b>{parseFloat(props.pair.rateAB).toFixed(4)}</b> {props.pair.symbolB}
+                1 {props.pair.symbolA} = <b>{props.pair.rateAB < 0.0001 ? parseFloat(props.pair.rateAB).toFixed(9) : parseFloat(props.pair.rateAB).toFixed(4)}</b> {props.pair.symbolB}
               </div>
               </span>
             </div>
             <div className="poolExplorer__reserve">
                <span className="select-item-descr"><div>
-                 1 {props.pair.symbolB} = <b>{parseFloat(props.pair.rateBA).toFixed(4)}</b> {props.pair.symbolA}
+                 1 {props.pair.symbolB} = <b>{props.pair.rateBA < 0.0001 ? parseFloat(props.pair.rateBA).toFixed(8) : parseFloat(props.pair.rateBA).toFixed(4)}</b> {props.pair.symbolA}
                </div>
                </span>
             </div>

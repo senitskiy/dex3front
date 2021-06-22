@@ -11,6 +11,10 @@ const GContract = {
                     {
                         "name": "addr",
                         "type": "address"
+                    },
+                    {
+                        "name": "count",
+                        "type": "uint128"
                     }
                 ],
                 "outputs": []
@@ -24,6 +28,6 @@ const GContract = {
         "data": [],
         "events": []
     },
-    tvc: "te6ccgECDgEAAWwAAgE0AwEBAcACAEPQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgBCj/AIrtUyDjAyDA/+MCIMD+4wLyCwwFBA0CiiHbPNMAAZ+BAgDXGCD5AVj4QvkQ8qje0z8Bjh34QyG5IJ8wIPgjgQPoqIIIG3dAoLnekyD4Y+DyNNgw0x8B2zz4R27yfAgGATQi0NcLA6k4ANwhxwDcIdMfId0B2zz4R27yfAYCKCCCEGfPHaO64wIgghBotV8/uuMCCQcCKjD4QW7jAPhG8nNx+GbR+ADbPH/4ZwgKAGrtRNAg10nCAY4Q0//TP9MA0X/4Yfhm+GP4Yo4Y9AVwAYBA9A7yvdcL//hicPhjcPhmf/hh4gIWMPpA0ds84wB/+GcLCgAk+ELIy//4Q88LP/hGzwsAye1UAFD4ACDIz4UIzo0ElC9/WPgAAAAAAAAAAAAAAAAAAc8Wz4HPgclz+wAwAQr0pCD0oQ0AAA=="
+    tvc: "te6ccgECDwEAAZ4AAgE0AwEBAcACAEPQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgBCSK7VMg4wMgwP/jAiDA/uMC8gsMBQQOAooh2zzTAAGfgQIA1xgg+QFY+EL5EPKo3tM/AY4d+EMhuSCfMCD4I4ED6KiCCBt3QKC53pMg+GPg8jTYMNMfAds8+Edu8nwIBgE6ItDXCwOpOADcIccA3CHXDR/yvCHdAds8+Edu8nwGAiggghAwbS+puuMCIIIQaLVfP7rjAgkHAiow+Ehu4wD4RvJzcfhm0fgA2zx/+GcICgBq7UTQINdJwgGOENP/0z/TANF/+Gj4Zvhj+GKOGPQFcAGAQPQO8r3XC//4YnD4Y3D4Zn/4aOICODD6QZXU0dD6QN/XDX+V1NHQ03/f0ds84wB/+GcLCgAg+Eb4Q/hCyMv/yz/LAMntVAB6+ACCGBnYHZYAIcAAIJMwXL7fjhJTAsjPhQjOAfoCgGvPQMlz+wCOElMSyM+FCM4B+gKAa89AyXP7AOJfAwIK9KQg9KEODQAUc29sIDAuNDUuMAAA"
 };
 module.exports = { GContract };

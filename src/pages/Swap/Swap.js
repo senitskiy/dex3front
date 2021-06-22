@@ -89,7 +89,7 @@ function Swap () {
                 <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button> :
                 <button className="btn mainblock-btn" onClick={() => history.push('/account')}>Connect wallet</button>
               }
-              { (fromToken.symbol && toToken.symbol) && <p className="swap-rate">Price <span>{parseFloat(rate.toFixed(4))} {toToken.symbol}</span> per <span>{fromToken.symbol}</span></p> }
+              { (fromToken.symbol && toToken.symbol) && <p className="swap-rate">Price <span>{rate < 0.0001 ? parseFloat(rate.toFixed(8)) : parseFloat(rate.toFixed(4))} {toToken.symbol}</span> per <span>{fromToken.symbol}</span></p> }
 
             </div>
           }

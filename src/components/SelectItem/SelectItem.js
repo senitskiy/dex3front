@@ -108,7 +108,7 @@ console.log("props",props)
           <p className="select-item-descr">{getFullName(props.symbol)}</p>
         </div>
       </div>
-      { walletIsConnected && <span className="select-item-balance">{props.balance > 0 ? parseFloat(props.balance.toFixed(4)) : props.balance}</span> }
+      { walletIsConnected && <span className="select-item-balance">{props.balance < 0.0001 ? parseFloat(props.balance.toFixed(8)) :  parseFloat(props.balance.toFixed(4))}</span> }
     </div>
   )
 }

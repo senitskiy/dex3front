@@ -60,7 +60,7 @@ function Item(props) {
             </div>
           </div>
           <div>
-            { walletIsConnected && <span style={{marginRight: "10px"}} className="select-item-balance">{props.balance > 0 ? parseFloat(props.balance.toFixed(4)) : props.balance}</span> }
+            { walletIsConnected && <span style={{marginRight: "10px"}} className="select-item-balance">{props.balance < 0.0001 ? parseFloat(props.balance.toFixed(8)) : parseFloat(props.balance.toFixed(4))}</span> }
             {props.lp===false && <button className="btn input-btn" onClick={faucet}>
               <svg style={{marginLeft: "0"}} xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" viewBox="0 0 20 20" version="1.1">
                 <g id="surface1">
