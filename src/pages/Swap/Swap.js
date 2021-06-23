@@ -70,11 +70,15 @@ if(!pairsList || !pairId){
   const rate = useSelector(state => state.swapReducer.rate);
 
   function handleConfirm() {
+
+
     if(fromToken.symbol && toToken.symbol && fromValue) {
       // if(fromValue > fromToken.balance ) {
       //   dispatch(showPopup({type: 'error', message: 'Excess of balance'}));
       //   return;
       // }
+
+
       setSwapConfirmPopupIsVisible(true);
     } else {
       dispatch(showPopup({type: 'error', message: 'Fields should not be empty'}));
@@ -82,6 +86,9 @@ if(!pairsList || !pairId){
   }
   async function handleConnectPair() {
       console.log("22",curExist)
+
+
+
     setconnectAsyncIsWaiting(true);
         let connectRes = await connectToPair(curExt, pairId);
 

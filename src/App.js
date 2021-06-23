@@ -31,6 +31,7 @@ function App() {
   const liquidityList = useSelector(state => state.walletReducer.liquidityList);
 
 
+const [onloading,setonloading] = useState(false)
   const manageAsyncIsWaiting = useSelector(state => state.manageReducer.manageAsyncIsWaiting);
   const subscribeData = useSelector(state => state.walletReducer.subscribeData);
   const curExt = useSelector(state => state.appReducer.curExt);
@@ -45,6 +46,7 @@ function App() {
   }
 
   useEffect(async () => {
+      setonloading(true)
     const theme = localStorage.getItem('appTheme') === null ? 'light' : localStorage.getItem('appTheme');
     if(appTheme !== theme) dispatch(changeTheme(theme));
 
@@ -126,7 +128,8 @@ console.log("pubKey2",pubKey2)
     const transactionsList = localStorage.getItem('transactionsList') === null ? [] : JSON.parse(localStorage.getItem('transactionsList'));
     if(transactionsList.length) dispatch(setTransactionsList(transactionsList));
 
-
+      setonloading(false)
+      console.log("setonloading",onloading)
   }, []);
 
 
@@ -138,7 +141,7 @@ console.log("pubKey2",pubKey2)
   }, [swapAsyncIsWaiting, poolAsyncIsWaiting, manageAsyncIsWaiting]);
 
   useEffect(async () => {
-
+      // setonloading(true)
     if(subscribeData.dst) {
       const clientBalance = await getClientBalance(pubKey.address);
 console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey.address)
@@ -212,10 +215,12 @@ console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey.ad
         history.push('/pool')
       }
     }
+      // setonloading(false)
   }, [subscribeData]);
 
   return (
     <>
+        {onloading && <div className="blockDiv"></div>}
       <div className="beta">Beta version. Use desktop Google Chrome</div>
       <Header />
       <Switch location={location}>
