@@ -215,7 +215,7 @@ function SwapConfirmPopup(props) {
                   <p className="mainblock-footer-subtitle">Price</p>
                 </div>
                 <div className="swap-confirm-wrap">
-                  <p className="mainblock-footer-value">{(fromValue * 0.03) / 100} {fromToken.symbol}</p>
+                  <p className="mainblock-footer-value">{((fromValue * 0.3) / 100).toFixed((fromValue > 0.0001) ? 4 : 6)} {fromToken.symbol}</p>
                   <p className="mainblock-footer-subtitle">Liquidity Provider Fee</p>
                 </div>
                 {/*<div>*/}

@@ -78,7 +78,6 @@ function AddLiquidity () {
 
 
   function getTotalLP (qtyA, qtyB, reserveA, reserveB,totalSupplyBefore) {
-
 //console.log("qtyA, qtyB, reserveA, reserveB,totalSupplyBefore",qtyA, qtyB, reserveA, reserveB,totalSupplyBefore)
     let qtyArr = qtyForProvide(qtyA, qtyB, reserveA, reserveB);
     let provideArr = acceptForProvide(qtyArr[0], qtyArr[1], reserveA, reserveB);
@@ -152,9 +151,11 @@ function AddLiquidity () {
   // }
 
 
-  function mixPercentValue(fromValue, totalSup){
-    let percOfTotal = ((fromValue*100)/(totalSup+fromValue)).toFixed(6)
-    //console.log("totalSup",totalSup)
+  function mixPercentValue(totalLP, totalSup){
+    let percOfTotal = (totalLP*100)/totalSup
+    //
+    // let percOfTotal = ((fromValue*100)/(totalSup+fromValue)).toFixed(6)
+    // //console.log("totalSup",totalSup)
     return +percOfTotal
   }
 
@@ -198,7 +199,16 @@ function AddLiquidity () {
 
                       <div>
                         <span>{
-                          (getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000) < 0.0001 ? (getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000).toFixed(8) : (getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000).toFixed(4)}</span>
+
+                          (getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000) !== 0
+                              ?
+                          (getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000) < 0.0001 ? (getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000).toFixed(6) : (getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000).toFixed(4)
+                          :
+                          (getTotalLP(fromValue*1000000000,toValue*1000000000,ratesData.reservesA*1000000000,ratesData.reservesB*1000000000, ratesData.totalSupply*1000000000)/1000000000).toFixed(4)
+
+                        }</span>
+
+
                         You will receive LP tokens
                       </div>
 
@@ -218,17 +228,23 @@ function AddLiquidity () {
 
                 <div className="add-liquidity-wrapper">
                   <div>
-                    <span>{`${mixPercentValue(fromValue, ratesData.totalSupply) < 0.0001 ? (mixPercentValue(fromValue, ratesData.totalSupply)).toFixed(8) : (mixPercentValue(fromValue, ratesData.totalSupply)).toFixed(4) } %`}</span>
+                    <span>{`${
+                        mixPercentValue(fromValue, ratesData.totalSupply) !== 0 ?
+                      mixPercentValue(fromValue, ratesData.totalSupply) < 0.0001 ? (mixPercentValue(totalLP, ratesData.totalSupply)).toFixed(8) : (mixPercentValue(totalLP, ratesData.totalSupply)).toFixed(4) 
+                            :
+                            (mixPercentValue(totalLP, ratesData.totalSupply)).toFixed(4)
+
+                    } %`}</span>
                     Your share of pool
                   </div>
                   <div>
                     <span>{parseFloat(ratesData.reservesA).toFixed(4)}</span>
-                    {toTokenSymbol} deposited
+                    {fromTokenSymbol} pooled
                   </div>
 
                   <div>
                     <span>{parseFloat(ratesData.reservesB).toFixed(4)}</span>
-                    {fromTokenSymbol} deposited
+                    {toTokenSymbol} pooled
                   </div>
                 </div>
 
