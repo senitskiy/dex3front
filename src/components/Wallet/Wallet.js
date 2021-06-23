@@ -27,7 +27,7 @@ function Wallet() {
 
   return (
     <div className="wallet">
-      {!walletIsConnected ?
+      {(!walletIsConnected && wallet) ?
         <button className="btn wallet-btn" onClick={handleClick}>Connect wallet</button> :
         <div className="wallet-wrap" onClick={() => history.push('/account')}>
           <span className="wallet-ballance">Gas: {wallet.balance.toFixed(4)} TON</span>

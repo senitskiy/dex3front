@@ -126,16 +126,12 @@ if(!pairsList || !pairId){
         }
       setconnectAsyncIsWaiting(false);
       setExistsPair(true)
-
-
-
-
   }
 
   function getCurBtn(){
       console.log("22",curPia)
           if(curExist && fromToken.symbol && toToken.symbol){
-              console.log(1)
+              console.log(1,curExist)
 
           return <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button>
       }else if(!curExist && fromToken.symbol && toToken.symbol){
@@ -198,7 +194,8 @@ if(!pairsList || !pairId){
                   :
                 <button className="btn mainblock-btn" onClick={() => history.push('/account')}>Connect wallet</button>
               }
-              { (fromToken.symbol && toToken.symbol) && <p className="swap-rate">Price <span>{rate < 0.0001 ? parseFloat(rate.toFixed(8)) : parseFloat(rate.toFixed(4))} {toToken.symbol}</span> per <span>{fromToken.symbol}</span></p> }
+
+              { (fromToken.symbol && toToken.symbol) && <p className="swap-rate">Price <span>{parseFloat(rate).toFixed(rate > 0.0001 ? 4 : 6)} {toToken.symbol}</span> per <span>1 {fromToken.symbol}</span></p> }
 
             </div>
           }

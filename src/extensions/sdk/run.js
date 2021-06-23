@@ -284,7 +284,14 @@ export async function connectToPair(curExt,pairAddr) {
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
+
     await transferFromGiver(getClientAddressFromRoot.dexclient, 5e9)
+
+    // let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
+    // if(6000000000 > (checkClientBalance*1000000000)){
+    //     await transfer(SendTransfer,getClientAddressFromRoot.dexclient,8000000000)
+    // }
+
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         await callMethod("connectPair", {pairAddr: pairAddr}, clientContract)

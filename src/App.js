@@ -59,21 +59,26 @@ function App() {
     console.log("curExtt",curExtt._extLib.pubkey)
 
 
-    const pubKey = localStorage.getItem('pubKey') === null ?
+    const pubKey2 =
+        // localStorage.getItem('pubKey') === null ?
         await checkPubKey(curExtt._extLib.pubkey)
-        :
-        JSON.parse(localStorage.getItem('pubKey'));
+        // :
+        // JSON.parse(localStorage.getItem('pubKey'));
+console.log("pubKey2",pubKey2)
+    if(pubKey2.status){
+      dispatch(setPubKey(pubKey2));
+      // history.push("/Account")
+    }
 
-    if(pubKey.status) dispatch(setPubKey(pubKey));
 
-
-    const wallet = localStorage.getItem('wallet') === null ?
+    const wallet =
+        // localStorage.getItem('wallet') === null ?
         {
-          id:pubKey.dexclient,
-          balance:await getClientBalance(pubKey.dexclient)
+          id:pubKey2.dexclient,
+          balance:await getClientBalance(pubKey2.dexclient)
         }
-        :
-        JSON.parse(localStorage.getItem('wallet'));
+        // :
+        // JSON.parse(localStorage.getItem('wallet'));
 
     if(wallet.id) {
       dispatch(setWallet(wallet));
@@ -83,7 +88,7 @@ function App() {
 
     let arrPairs = [];
     await pairs.map(async item=>{
-      item.exists = await checkClientPairExists(pubKey.dexclient, item.pairAddress)
+      item.exists = await checkClientPairExists(pubKey2.dexclient, item.pairAddress)
       arrPairs.push(item)
     })
     dispatch(setPairsList(pairs));
@@ -97,7 +102,8 @@ function App() {
     // const tokenList = localStorage.getItem('tokenList') === null ? tokenList : JSON.parse(localStorage.getItem('tokenList'));
 
 
-    let tokenList = await getAllClientWallets(pubKey.dexclient);
+    let tokenList = await getAllClientWallets(pubKey2.dexclient);
+    console.log("tokenList",tokenList)
     let liquidityList = [];
     // console.log('token list',tokenList,"pubKey.address",pubKey.address);
     if(tokenList.length) {
