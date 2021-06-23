@@ -40,6 +40,7 @@ function ExtensionsList() {
       if(i.name === name) {
         if(i.available) {
           let curExt = await getCurrentExtension(name);
+
           dispatch(setCurExt(curExt));
           dispatch(connectWallet());
         } else {

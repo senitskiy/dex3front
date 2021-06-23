@@ -48,6 +48,8 @@ console.log("tokenList",tokenList,"LPTokenList",LPTokenList)
 
 useEffect(async ()=>{
     let allWallets = await getAllClientWallets(wallet && wallet.id)
+
+    console.log("allWallets",allWallets)
 if(allWallets.length > (tokenList.length + LPTokenList.length)){
     setAT(allWallets)
 

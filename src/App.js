@@ -61,22 +61,29 @@ const [onloading,setonloading] = useState(false)
 
     dispatch(setExtensionsList(extensionsList));
 
+
+
+
+
     const curExtname = localStorage.getItem('extName') === null ? {} : localStorage.getItem('extName');
     let curExtt = await getCurrentExtension(curExtname)
-    dispatch(setCurExt(curExtt));
+
 
     console.log("curExtt",curExtt._extLib.pubkey)
 
+      const pubKey2 = await checkPubKey(curExtt._extLib.pubkey)
 
-    const pubKey2 =
-        // localStorage.getItem('pubKey') === null ?
-        await checkPubKey(curExtt._extLib.pubkey)
-        // :
-        // JSON.parse(localStorage.getItem('pubKey'));
+
+
+      if(!pubKey2.status){
+          setonloading(false)
+          return
+      }
 console.log("pubKey2",pubKey2)
     if(pubKey2.status){
       dispatch(setPubKey(pubKey2));
       // history.push("/Account")
+        dispatch(setCurExt(curExtt));
     }
 
 
@@ -100,7 +107,7 @@ console.log("pubKey2",pubKey2)
       item.exists = await checkClientPairExists(pubKey2.dexclient, item.pairAddress)
       arrPairs.push(item)
     })
-    dispatch(setPairsList(pairs));
+    dispatch(setPairsList(arrPairs));
 
 
 
@@ -169,7 +176,8 @@ console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey.ad
             symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
           })
         );
-
+          localStorage.setItem('tokenList', JSON.stringify(tokenList));
+          localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
         dispatch(setTokenList(tokenList));
         dispatch(setLiquidityList(liquidityList));
       }
