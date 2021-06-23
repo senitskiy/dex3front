@@ -157,7 +157,7 @@ export async function checkClientPairExists(clientAddress,pairAddress) {
 
 
 export async function getAllClientWallets(clientAddress) {
-
+console.log("clientAddress____",clientAddress)
     const acc = new Account(DEXclientContract, {address: clientAddress, client});
     const response = await acc.runLocal("rootWallet", {});
     let normalizeWallets = []
@@ -176,6 +176,7 @@ export async function getAllClientWallets(clientAddress) {
             itemData.balance = +curWalletData.decoded.output.value0.balance / 1000000000;
             normalizeWallets.push(itemData)
         }
+        console.log("normalizeWallets",normalizeWallets)
         return normalizeWallets
     } catch (e) {
         console.log("catch E", e);
@@ -258,6 +259,7 @@ export async function getAllPairsWoithoutProvider() {
 export async function getClientBalance(clientAddress) {
 console.log("clientAddress",clientAddress)
     let address = clientAddress
+    if(clientAddress === "0:0000000000000000000000000000000000000000000000000000000000000000")return 0
     try {
         let clientBalance = await client.net.query_collection({
             collection: "accounts",
@@ -331,7 +333,8 @@ export async function subscribe(address) {
             if (decoded === 304) {decoded = await decode.message(DEXclientContract.abi, params.result.boc)}
 
             if(decoded.name === "accept"){
-                store.dispatch(setSubscribeData({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens}))
+                console.log("decoded.name",decoded)
+                store.dispatch(setSubscribeData({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens:  decoded.value ? decoded.value.tokens : 0}))
                 return
             }
 console.log("decoded",decoded,"params",params)
