@@ -148,7 +148,7 @@ export async function checkClientPairExists(clientAddress,pairAddress) {
 
 
 export async function getAllClientWallets(clientAddress) {
-
+console.log("clientAddress____",clientAddress)
     const acc = new Account(DEXclientContract, {address: clientAddress, client});
     const response = await acc.runLocal("rootWallet", {});
     let normalizeWallets = []
@@ -167,6 +167,7 @@ export async function getAllClientWallets(clientAddress) {
             itemData.balance = +curWalletData.decoded.output.value0.balance / 1000000000;
             normalizeWallets.push(itemData)
         }
+        console.log("normalizeWallets",normalizeWallets)
         return normalizeWallets
     } catch (e) {
         console.log("catch E", e);
@@ -249,6 +250,7 @@ export async function getAllPairsWoithoutProvider() {
 export async function getClientBalance(clientAddress) {
 
     let address = clientAddress
+    if(clientAddress === "0:0000000000000000000000000000000000000000000000000000000000000000")return 0
     try {
         let clientBalance = await client.net.query_collection({
             collection: "accounts",

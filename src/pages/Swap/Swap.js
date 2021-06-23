@@ -43,6 +43,72 @@ function Swap () {
     }
   }
 
+  async function handleConnectPair() {
+      console.log("22",curExist)
+    setconnectAsyncIsWaiting(true);
+        let connectRes = await connectToPair(curExt, pairId);
+
+
+      if(!connectRes || (connectRes && (connectRes.code === 1000))){
+          console.log("connectRes",connectRes)
+          setconnectAsyncIsWaiting(false);
+          return
+      }
+        let tokenList = await getAllClientWallets(pubKey.address);
+        let countT = tokenList.length
+        let y = 0
+        while(tokenList.length < countT){
+
+          tokenList = await getAllClientWallets(pubKey.address);
+          y++
+          if(y>500){
+            dispatch(showPopup({type: 'error', message: 'Oops, too much time for deploying. Please connect your wallet again.'}));
+          }
+        }
+
+        dispatch(setTokenList(tokenList));
+
+
+        let liquidityList = [];
+
+        if(tokenList.length) {
+          tokenList.forEach(async item => await subscribe(item.walletAddress));
+
+          liquidityList = tokenList.filter(i => i.symbol.includes('/'));
+
+          tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
+              {
+                ...i,
+                symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
+              })
+          );
+          localStorage.setItem('tokenList', JSON.stringify(tokenList));
+          localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
+          dispatch(setTokenList(tokenList));
+          dispatch(setLiquidityList(liquidityList));
+        }
+      setconnectAsyncIsWaiting(false);
+      setExistsPair(true)
+  }
+
+  function getCurBtn(){
+      console.log("22",curPia)
+          if(curExist && fromToken.symbol && toToken.symbol){
+              console.log(1,curExist)
+
+          return <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button>
+      }else if(!curExist && fromToken.symbol && toToken.symbol){
+              console.log(2)
+
+              return <button className={(fromToken.symbol && toToken.symbol) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConnectPair()}>Connect pair</button>
+      }
+      console.log(3)
+
+              return <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button>
+
+  }
+
+
   // function getAmountOut(amountIn) {
   //   if(!amountIn){
   //     return 0
@@ -89,7 +155,7 @@ function Swap () {
                 <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button> :
                 <button className="btn mainblock-btn" onClick={() => history.push('/account')}>Connect wallet</button>
               }
-              { (fromToken.symbol && toToken.symbol) && <p className="swap-rate">Price <span>{parseFloat(rate.toFixed(4))} {toToken.symbol}</span> per <span>{fromToken.symbol}</span></p> }
+              { (fromToken.symbol && toToken.symbol) && <p className="swap-rate">Price <span>{parseFloat(rate).toFixed(rate > 0.0001 ? 4 : 6)} {toToken.symbol}</span> per <span>1 {fromToken.symbol}</span></p> }
 
             </div>
           }

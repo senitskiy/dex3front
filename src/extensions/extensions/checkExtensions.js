@@ -34,11 +34,11 @@ export async function getCurrentExtension(extension) {
     //     extensionsArry[0].name = "testing extraton"
     //     return extensionsArry[0]
     // }
-    if (extension === "extraton") {
+    // if (extension === "extraton") {
         curExtension._extLib = await extraton()
-    } else {
-        curExtension._extLib = await broxus()
-    }
+    // } else {
+    //     curExtension._extLib = await broxus()
+    // }
 
     // if (curExtension.length > 1) {
     //     return curExtension[0]

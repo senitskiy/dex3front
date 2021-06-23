@@ -57,7 +57,7 @@ function ManageConfirmPopup(props) {
               <span className="confirm-token">{fromToken.symbol}/{toToken.symbol}</span>
             </div>
             <button onClick={handleSupplyClick} to={'/add-liquidity'} className="btn popup-btn">Supply</button>
-            <div className="manage-remove-link"><span onClick={() => props.func()}>Remove</span></div>
+            {balance !== 0 ? <div className="manage-remove-link"><span onClick={() => props.func()}>Remove</span></div> : null}
           </>
         }
         footer={

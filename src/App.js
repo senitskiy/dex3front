@@ -3,7 +3,14 @@ import {useSelector, useDispatch} from 'react-redux';
 import {Switch, Route, Redirect, useLocation, useHistory} from 'react-router-dom';
 import {changeTheme, setCurExt, setExtensionsList, setWalletIsConnected, showPopup} from './store/actions/app';
 import {setLiquidityList, setPairsList, setPubKey, setSubscribeData, setTokenList, setTransactionsList, setWallet} from './store/actions/wallet';
-import { getAllClientWallets, getAllPairsWoithoutProvider, getClientBalance, subscribe } from './extensions/webhook/script';
+import {
+  checkClientPairExists,
+  checkPubKey,
+  getAllClientWallets,
+  getAllPairsWoithoutProvider,
+  getClientBalance,
+  subscribe
+} from './extensions/webhook/script';
 import { checkExtensions, getCurrentExtension } from './extensions/extensions/checkExtensions';
 import { setSwapAsyncIsWaiting, setSwapFromInputValue, setSwapFromToken, setSwapToInputValue, setSwapToToken } from './store/actions/swap';
 import { setPoolAsyncIsWaiting, setPoolFromInputValue, setPoolFromToken, setPoolToInputValue, setPoolToToken } from './store/actions/pool';
@@ -56,12 +63,43 @@ function App() {
     let curExtt = await getCurrentExtension(curExtname)
     dispatch(setCurExt(curExtt));
 
-    const wallet = localStorage.getItem('wallet') === null ? {} : JSON.parse(localStorage.getItem('wallet'));
+    console.log("curExtt",curExtt._extLib.pubkey)
+
+
+    const pubKey2 =
+        // localStorage.getItem('pubKey') === null ?
+        await checkPubKey(curExtt._extLib.pubkey)
+        // :
+        // JSON.parse(localStorage.getItem('pubKey'));
+console.log("pubKey2",pubKey2)
+    if(pubKey2.status){
+      dispatch(setPubKey(pubKey2));
+      // history.push("/Account")
+    }
+
+
+    const wallet =
+        // localStorage.getItem('wallet') === null ?
+        {
+          id:pubKey2.dexclient,
+          balance:await getClientBalance(pubKey2.dexclient)
+        }
+        // :
+        // JSON.parse(localStorage.getItem('wallet'));
+
+
     if(wallet.id) {
       dispatch(setWallet(wallet));
       dispatch(setWalletIsConnected(true));
     }
     const pairs = await getAllPairsWoithoutProvider();
+
+    let arrPairs = [];
+    await pairs.map(async item=>{
+      item.exists = await checkClientPairExists(pubKey2.dexclient, item.pairAddress)
+      arrPairs.push(item)
+    })
+
     dispatch(setPairsList(pairs));
 
     const pubKey = localStorage.getItem('pubKey') === null ? {} : JSON.parse(localStorage.getItem('pubKey'));
@@ -73,7 +111,8 @@ function App() {
     // const tokenList = localStorage.getItem('tokenList') === null ? tokenList : JSON.parse(localStorage.getItem('tokenList'));
 
 
-    let tokenList = await getAllClientWallets(pubKey.dexclient);
+    let tokenList = await getAllClientWallets(pubKey2.dexclient);
+    console.log("tokenList",tokenList)
     let liquidityList = [];
     // console.log('token list',tokenList,"pubKey.address",pubKey.address);
     if(tokenList.length) {
