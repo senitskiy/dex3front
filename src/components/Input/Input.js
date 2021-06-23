@@ -19,6 +19,7 @@ function Input(props) {
 
   const swapFromSelectIsVisible = useSelector(state => state.swapReducer.swapFromSelectIsVisible);
   const swapToSelectIsVisible = useSelector(state => state.swapReducer.swapToSelectIsVisible);
+  const revertValue = useSelector(state => state.swapReducer.revertValue);
 
   const poolFromSelectIsVisible = useSelector(state => state.poolReducer.poolFromSelectIsVisible);
   const poolToSelectIsVisible = useSelector(state => state.poolReducer.poolToSelectIsVisible);
@@ -64,9 +65,19 @@ function Input(props) {
   }, [swapFromToken, swapToToken, poolFromToken, poolToToken, pairsList])
 
   useEffect(() => {
-    changeValue();
+    // if(revertValue){
+    //   console.log("revert", revertValue)
+    //   changeValue(revertValue);
+    // }else{
+      console.log("revert +++++++",props.token.balance)
+      changeValue(props.token.balance);
+    // }
+
   }, [value, swapRate, poolRate])
 
+  // useEffect(() => {
+  //   changeValue(revertValue);
+  // }, [revertValue])
 
   async function handleClick() {
     try {
@@ -88,20 +99,22 @@ function Input(props) {
     }
   }
 
-  function changeValue() {
+  function changeValue(curValue) {
     if(location.pathname.includes('swap')) {
       if(props.type === 'from') {
-        if(props.token.balance && value > props.token.balance) {
-          let val = Number(props.token.balance) * swapRate;
+        console.log("hange vvalue",props.token.balance)
+        if(curValue && value > curValue) {
+          let val = Number(curValue) * swapRate;
           let val1 = 0;
           if(val < 0.0001) val1 = parseFloat(val.toFixed(8))
           else val1 = parseFloat(val.toFixed(4))
 
-          let val2 = Number(props.token.balance)
-          if(val2 < 0.0001) val2 = parseFloat(Number(props.token.balance).toFixed(8))
-          else val2 = parseFloat(Number(props.token.balance).toFixed(4))
+          let val2 = Number(curValue)
+          if(val2 < 0.0001) val2 = parseFloat(Number(curValue).toFixed(8))
+          else val2 = parseFloat(Number(curValue).toFixed(4))
           dispatch(setSwapFromInputValue(val2));
           dispatch(setSwapToInputValue(val));
+          console.log("val2",val2)
         }
         else  {
           dispatch(setSwapFromInputValue(value));
@@ -130,6 +143,17 @@ function Input(props) {
   function handleKeyPress(event) {
     if(event.key === '-' || event.key === '+') { event.preventDefault() }
   }
+  const [changer,setChanger] = useState(0)
+  useEffect(()=>{
+
+    setValue(changer)
+  },[changer])
+  useEffect(()=>{
+console.log("revertValue!!!",revertValue)
+    setValue(revertValue)
+  },[revertValue])
+
+
 
   return (
     <>
@@ -145,7 +169,7 @@ function Input(props) {
             type="number"
             className={props.value > 0 ? "input-field" : "input-field input-field--zero"}
             value={props.value}
-            onChange={event => setValue(+event.target.value)}
+            onChange={event => setChanger(+event.target.value)}
             onKeyPress={event => handleKeyPress(event)}
             min="0"
             autoFocus={props.autoFocus || false}

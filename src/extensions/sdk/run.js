@@ -199,6 +199,7 @@ export async function swapA(curExt,pairAddr, qtyA) {
  */
 
 export async function swapB(curExt,pairAddr, qtyB) {
+    console.log("qtyB",qtyB)
     const {pubkey, contract, callMethod,SendTransfer} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){

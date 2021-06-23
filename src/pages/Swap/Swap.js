@@ -34,6 +34,7 @@ function Swap () {
   const toToken = useSelector(state => state.swapReducer.toToken);
 
   const fromValue = useSelector(state => state.swapReducer.fromInputValue);
+  console.log("fromValue",fromValue)
   const toValue = useSelector(state => state.swapReducer.toInputValue);
   const pairId = useSelector(state => state.swapReducer.pairId);
   const swapAsyncIsWaiting = useSelector(state => state.swapReducer.swapAsyncIsWaiting);
@@ -51,21 +52,10 @@ if(!pairsList || !pairId){
 }
    let curePairData = pairsList.filter(item=>item.pairAddress===pairId)
     setExistsPair(curePairData[0].exists)
-      setCurrentPair(curePairData)
+    setCurrentPair(curePairData)
     console.log("curePairData",curePairData,"curePairData[0].exists")
 
   },[pairsList, pairId])
-
-    // useEffect(()=>{
-    //     console.log("fromToken",fromToken,"toToken",toToken )
-    //     if(!fromToken.symbol){
-    //         console.log("1111111",curExist)
-    //         setreadable(false)
-    //     }
-    //     setreadable(true)
-    //
-    // },[fromToken])
-
 
   const rate = useSelector(state => state.swapReducer.rate);
 

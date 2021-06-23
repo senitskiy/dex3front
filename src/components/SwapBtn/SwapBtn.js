@@ -1,14 +1,18 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
-import { setSwapFromToken, setSwapToToken } from '../../store/actions/swap';
+import {useDispatch, useSelector} from 'react-redux';
+import { setSwapFromToken, setSwapFromInputValue,setSwapFromInputValueChange,setSwapToToken } from '../../store/actions/swap';
 
 function SwapBtn(props) {
   const dispatch = useDispatch();
-
+  const toValue = useSelector(state => state.swapReducer.toInputValue);
+  const fromValue = useSelector(state => state.swapReducer.fromInputValue);
   function handleClick() {
     const {fromToken, toToken} = props;
 
     if(fromToken.symbol && toToken.symbol) {
+      console.log("fromToken",toValue,"toToken",fromValue)
+      // dispatch(setSwapFromInputValue(fromValue))
+      dispatch(setSwapFromInputValueChange(toValue));
       dispatch(setSwapFromToken(toToken));
       dispatch(setSwapToToken(fromToken));
     }
