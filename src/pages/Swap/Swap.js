@@ -119,8 +119,8 @@ if(!pairsList || !pairId){
                 symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
               })
           );
-          localStorage.setItem('tokenList', JSON.stringify(tokenList));
-          localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
+          //localStorage.setItem('tokenList', JSON.stringify(tokenList));
+          //localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
           dispatch(setTokenList(tokenList));
           dispatch(setLiquidityList(liquidityList));
         }

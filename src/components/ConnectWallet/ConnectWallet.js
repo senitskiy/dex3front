@@ -57,8 +57,8 @@ function ConnectWallet() {
 
                 dispatch(setTokenList(tokenList));
                 dispatch(setLiquidityList(liquidityList));
-                localStorage.setItem('tokenList', JSON.stringify(tokenList));
-                localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
+                //localStorage.setItem('tokenList', JSON.stringify(tokenList));
+                //localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
             }
             const clientBalance = await getClientBalance(pubKey.dexclient);
             dispatch(setPubKey(pubKey));
