@@ -104,8 +104,10 @@ function SwapConfirmPopup(props) {
               localStorage.setItem("currentElement", item);
               localStorage.setItem("lastType", "swap");
               if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
+
             }else{
               dispatch(setSwapAsyncIsWaiting(false))
+
             }
           } else if(fromToken.symbol === i.symbolB && toToken.symbol === i.symbolA) {
             let res = await swapB(curExt, pairId, fromValue * 1000000000);
@@ -142,8 +144,11 @@ function SwapConfirmPopup(props) {
               localStorage.setItem("currentElement", item);
               localStorage.setItem("lastType", "swap");
               if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
+
             }else{
               dispatch(setSwapAsyncIsWaiting(false))
+
+
             }
           }
         })

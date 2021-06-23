@@ -5,7 +5,14 @@ import {changeTheme, setCurExt, setExtensionsList, setWalletIsConnected, showPop
 import {setLiquidityList, setPairsList, setPubKey, setSubscribeData, setTokenList, setTransactionsList, setWallet} from './store/actions/wallet';
 import { getAllClientWallets, getAllPairsWoithoutProvider, getClientBalance,checkPubKey, subscribe,checkClientPairExists } from './extensions/webhook/script';
 import { checkExtensions, getCurrentExtension } from './extensions/extensions/checkExtensions';
-import { setSwapAsyncIsWaiting, setSwapFromInputValue, setSwapFromToken, setSwapToInputValue, setSwapToToken } from './store/actions/swap';
+import {
+    setSwapAsyncIsWaiting,
+    setSwapFromInputValue,
+    setSwapFromInputValueChange,
+    setSwapFromToken,
+    setSwapToInputValue,
+    setSwapToToken
+} from './store/actions/swap';
 import { setPoolAsyncIsWaiting, setPoolFromInputValue, setPoolFromToken, setPoolToInputValue, setPoolToToken } from './store/actions/pool';
 import { setManageAsyncIsWaiting, setManageBalance, setManageFromToken, setManagePairId, setManageRateAB, setManageRateBA, setManageToToken } from './store/actions/manage';
 import Account from './pages/Account/Account';
@@ -182,6 +189,7 @@ console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey.ad
         dispatch(setSwapFromInputValue(0));
         dispatch(setSwapToInputValue(0));
         dispatch(setSwapAsyncIsWaiting(false));
+          dispatch(setSwapFromInputValueChange(0));
       } else if(poolAsyncIsWaiting) {
         dispatch(showPopup({type: 'success', link: subscribeData.transactionID}));
         dispatch(setPoolFromToken({

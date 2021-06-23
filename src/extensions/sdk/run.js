@@ -181,10 +181,11 @@ export async function swapA(curExt,pairAddr, qtyA) {
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
-    await transferFromGiver(getClientAddressFromRoot.dexclient, 300000000)
+
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         const processSwapA = await callMethod("processSwapA", {pairAddr:pairAddr, qtyA:qtyA}, clientContract)
+        transferFromGiver(getClientAddressFromRoot.dexclient, 300000000).then(res=>console.log("sucess ended",res))
         return processSwapA
     } catch (e) {
         return e
@@ -205,15 +206,17 @@ export async function swapB(curExt,pairAddr, qtyB) {
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
-    await transferFromGiver(getClientAddressFromRoot.dexclient, 300000000)
+
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         const processSwapA = await callMethod("processSwapB", {pairAddr:pairAddr, qtyB:qtyB}, clientContract)
+        transferFromGiver(getClientAddressFromRoot.dexclient, 300000000).then(res=>console.log("sucess ended",res))
         return processSwapA
     } catch (e) {
         console.log("catch E processSwapB", e);
         return e
     }
+
 }
 
 /**
@@ -232,10 +235,10 @@ export async function returnLiquidity(curExt,pairAddr, tokens) {
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
-    await transferFromGiver(getClientAddressFromRoot.dexclient, 300000000)
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         const returnLiquidity = await callMethod("returnLiquidity", {pairAddr:pairAddr, tokens: tokens}, clientContract)
+        transferFromGiver(getClientAddressFromRoot.dexclient, 300000000).then(res=>console.log("sucess ended",res))
         return returnLiquidity
     } catch (e) {
         console.log("catch E returnLiquidity", e);
@@ -259,10 +262,10 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
-    await transferFromGiver(getClientAddressFromRoot.dexclient, 300000000)
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         const processLiquidity = await callMethod("processLiquidity", {pairAddr:pairAddr, qtyA:Number(qtyA).toFixed(0), qtyB:Number(qtyB).toFixed(0)}, clientContract)
+        transferFromGiver(getClientAddressFromRoot.dexclient, 300000000).then(res=>console.log("sucess ended",res))
         return processLiquidity
     } catch (e) {
         console.log("catch E processLiquidity", e);
@@ -286,7 +289,7 @@ export async function connectToPair(curExt,pairAddr) {
         return getClientAddressFromRoot
     }
 
-    await transferFromGiver(getClientAddressFromRoot.dexclient, 5e9)
+    transferFromGiver(getClientAddressFromRoot.dexclient, 4500000000).then(res=>console.log("secess transfered from giver",res))
 
     // let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
     // if(6000000000 > (checkClientBalance*1000000000)){
