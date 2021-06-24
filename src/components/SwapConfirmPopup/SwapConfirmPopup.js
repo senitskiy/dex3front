@@ -140,7 +140,7 @@ function SwapConfirmPopup(props) {
                 toValue: null,
                 toSymbol: toToken.symbol
               })
-              let item = (newLength - olderLength) - 1
+              let item = newLength - 1
               localStorage.setItem("currentElement", item);
               localStorage.setItem("lastType", "swap");
               if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));

@@ -8,6 +8,7 @@ import MainBlock from '../MainBlock/MainBlock';
 import CloseBtn from '../CloseBtn/CloseBtn';
 import {setSwapAsyncIsWaiting} from "../../store/actions/swap";
 import {setManageAsyncIsWaiting} from "../../store/actions/manage";
+import {setTransactionsList} from "../../store/actions/wallet";
 
 function PoolConfirmPopup(props) {
   const dispatch = useDispatch();
@@ -20,17 +21,39 @@ function PoolConfirmPopup(props) {
   const fromValue = useSelector(state => state.poolReducer.fromInputValue);
   const toValue = useSelector(state => state.poolReducer.toInputValue);
 
+
+  const transactionsList = useSelector(state => state.walletReducer.transactionsList);
+
   const pairId = useSelector(state => state.poolReducer.pairId);
 
   async function handleSuply() {
+
     dispatch(setPoolAsyncIsWaiting(true));
     props.hideConfirmPopup();
 
       let poolStatus = await processLiquidity(curExt, pairId, fromValue * 1000000000, toValue * 1000000000);
+    console.log("pairId",pairId)
       console.log("poolStatus",poolStatus)
     if(!poolStatus || (poolStatus && (poolStatus.code === 1000))){
       dispatch(setPoolAsyncIsWaiting(false))
     }
+
+    let olderLength = transactionsList.length;
+    let newLength = transactionsList.push({
+      type: "processLiquidity",
+      fromValue: fromValue,
+      toValue: toValue,
+      fromSymbol: fromToken.symbol,
+      toSymbol: toToken.symbol,
+      lpTokens: null,
+      LPsymbol:`DS-W${fromToken.symbol}/W${toToken.symbol}`
+    })
+    let item = newLength - 1
+    console.log("itemitem",typeof item,item,"prop",newLength - 1, "menu",newLength.length - olderLength.length)
+    localStorage.setItem("currentElement", item);
+    localStorage.setItem("lastType", "processLiquidity");
+    if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
+
 
     // if(poolStatus && poolStatus.code){
     //   dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));

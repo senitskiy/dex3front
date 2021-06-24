@@ -18,6 +18,7 @@ function ManageConfirmPopup(props) {
   const pairS = useSelector(state => state.walletReducer.pairsList);
   let curPair = pairS.filter(item=>item.pairAddress === pairId)
 
+
   let poolShare = (balance*100)/(curPair[0].totalSupply/1000000000)
   let pooledTokensA = (curPair[0].reserveA/1000000000)*poolShare
   let pooledTokensB = (curPair[0].reservetB/1000000000)*poolShare

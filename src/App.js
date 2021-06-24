@@ -157,17 +157,36 @@ console.log("pubKey2",pubKey2)
   useEffect(async () => {
       // setonloading(true)
     if(subscribeData && subscribeData.dst) {
-        const pubKey2 = await checkPubKey(curExt._extLib.pubkey)
+      const pubKey2 = await checkPubKey(curExt._extLib.pubkey)
       const clientBalance = await getClientBalance(pubKey2.dexclient);
 console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey2.dexclient)
       let item = localStorage.getItem("currentElement");
-      if(transactionsList[item]) transactionsList[item].toValue = subscribeData.amountOfTokens / 1e9;
-      if (transactionsList.length) dispatch(setTransactionsList(transactionsList));
+        let lastTransactioType = localStorage.getItem("lastType");
+
+        if(lastTransactioType === "swap") {
+            console.log("item", item, "subscribeData swap", subscribeData, typeof subscribeData.amountOfTokens)
+            if (transactionsList[item]) transactionsList[item].toValue = (Number(subscribeData.amountOfTokens / 1e9));
+            if (transactionsList.length) dispatch(setTransactionsList(transactionsList));
+        }
+        if(lastTransactioType === "processLiquidity") {
+            console.log("item", item, "subscribeData processLiquidity", subscribeData)
+            if (transactionsList[item]) transactionsList[item].lpTokens = (Number(subscribeData.amountOfTokens / 1e9)).toFixed(Number(subscribeData.amountOfTokens / 1e9) <0.0001 ? 6 : 4);
+            if (transactionsList.length) dispatch(setTransactionsList(transactionsList));
+        }
+
+
+
       dispatch(setWallet({id: pubKey.address, balance: clientBalance}));
+
+
+
+
+
       let tokenList = await getAllClientWallets(pubKey.address);
       console.log("tokenList after WEBH",tokenList)
       let liquidityList = [];
       console.log(9999395394583590, tokenList)
+
       if(tokenList.length) {
         tokenList.forEach(async item => await subscribe(item.walletAddress));
 
