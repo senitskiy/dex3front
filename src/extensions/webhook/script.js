@@ -345,7 +345,6 @@ export async function subscribe(address) {
             }
 console.log("decoded",decoded,"params",params)
 
-
             if(decoded.value && decoded.value.grams){
                 return null
             }

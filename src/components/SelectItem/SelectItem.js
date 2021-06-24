@@ -8,10 +8,11 @@ import {hideSwapFromSelect, hideSwapToSelect, setSwapFromToken, setSwapPairId, s
 import './SelectItem.scss';
 
 function getFullName(name){
-  console.log("name",name)
   if(name === "TON"){
     return "TON Crystal"
-  }else if(name === "fBTC"){
+  } else if(name === "WTON"){
+    return "TON Crystal"
+  } else if(name === "fBTC"){
     return "fBitcoin"
   }else if(name === "WETH"){
     return "Ethereum"
@@ -28,7 +29,7 @@ function getFullName(name){
   }else if(name === "USDT"){
     return "Tether"
   }else{
-    return "default tokens"
+    return name
   }
 }
 

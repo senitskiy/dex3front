@@ -53,24 +53,31 @@ useEffect(()=>{
 
 useEffect(async ()=>{
     let allWallets = await getAllClientWallets(wallet && wallet.id)
+    if(allWallets.length === (tokenList.length + LPTokenList.length)) return;
+    if(allWallets.length > (tokenList.length + LPTokenList.length)){
 
 
+       // allWallets.forEach(async item => await subscribe(item.walletAddress));
 
+let liquidityListST = allWallets.filter(i => i.symbol.includes('/'));
 
-if(allWallets.length > (tokenList.length + LPTokenList.length)) {
-    allWallets.forEach(async item => await subscribe(item.walletAddress));
+let tokenListST = allWallets.filter(i => !i.symbol.includes('/')).map(i => (
+    {
+        ...i,
+        symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
+    })
+);
 
-    let liquidityListST = allWallets.filter(i => i.symbol.includes('/'));
+    //localStorage.setItem('tokenList', JSON.stringify(tokenListST));
+    //localStorage.setItem('liquidityList', JSON.stringify(liquidityListST));
 
-    let tokenListST = allWallets.filter(i => !i.symbol.includes('/')).map(i => (
-        {
-            ...i,
-            symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
-        })
-    );
-console.log("tokenListST",tokenListST,"liquidityListST",liquidityListST)
-    localStorage.setItem('tokenList', JSON.stringify(tokenListST));
-    localStorage.setItem('liquidityList', JSON.stringify(liquidityListST));
+    tokenListST.map((i) => {
+        i.lp = false;
+    })
+    liquidityListST.map((i) => {
+       i.lp = true;
+    })
+        setAT([...tokenListST, ...liquidityListST])
     dispatch(setTokenList(tokenListST));
     dispatch(setLiquidityList(liquidityListST));
     // setAT(toArray(tokenListST, liquidityListST))
@@ -131,7 +138,7 @@ console.log("tokenListST",tokenListST,"liquidityListST",liquidityListST)
                                             walletAddress={item.walletAddress}
                                             symbol={item.symbol}
                                             balance={item.balance}
-                                            lp={item.lp}
+                                            lp={item.lp || false}
                                             key={item.symbol}
                                         />
                                     ))
