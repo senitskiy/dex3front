@@ -164,6 +164,7 @@ console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey.ad
       if (transactionsList.length) dispatch(setTransactionsList(transactionsList));
       dispatch(setWallet({id: pubKey.address, balance: clientBalance}));
       let tokenList = await getAllClientWallets(pubKey.address);
+      console.log("tokenList after WEBH",tokenList)
       let liquidityList = [];
       if(tokenList.length) {
         tokenList.forEach(async item => await subscribe(item.walletAddress));

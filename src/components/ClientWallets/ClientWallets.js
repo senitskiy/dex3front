@@ -45,35 +45,69 @@ console.log("tokenList",tokenList,"LPTokenList",LPTokenList)
     }
 
     //console.log(LPTokenList);
+useEffect(()=>{
+    setAT(toArray(tokenList, LPTokenList))
+
+
+},[tokenList,LPTokenList])
 
 useEffect(async ()=>{
     let allWallets = await getAllClientWallets(wallet && wallet.id)
 
-    console.log("allWallets",allWallets)
-if(allWallets.length > (tokenList.length + LPTokenList.length)){
-    setAT(allWallets)
 
+
+
+if(allWallets.length > (tokenList.length + LPTokenList.length)) {
     allWallets.forEach(async item => await subscribe(item.walletAddress));
 
-    let liquidityListST = tokenList.filter(i => i.symbol.includes('/'));
+    let liquidityListST = allWallets.filter(i => i.symbol.includes('/'));
 
-    let tokenListST = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
+    let tokenListST = allWallets.filter(i => !i.symbol.includes('/')).map(i => (
         {
             ...i,
             symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
         })
     );
-
+console.log("tokenListST",tokenListST,"liquidityListST",liquidityListST)
     localStorage.setItem('tokenList', JSON.stringify(tokenListST));
     localStorage.setItem('liquidityList', JSON.stringify(liquidityListST));
     dispatch(setTokenList(tokenListST));
     dispatch(setLiquidityList(liquidityListST));
-
+    // setAT(toArray(tokenListST, liquidityListST))
 }
 
+    let changeba = allWallets && allWallets.filter(item=>{
+        let curBD = at.filter(item2=>item2.walletAddress === item.walletAddress)
+        console.log("curItem1",item, "curBD",curBD)
+        //TODO CHECK console.log curDB
+        if(!curBD.length) return
+        return curBD[0].balance !== item.balance
 
+    })
 
+    if(changeba.length){
+        // allWallets.forEach(async item => await subscribe(item.walletAddress));
+
+        let liquidityListST = allWallets.filter(i => i.symbol.includes('/'));
+
+        let tokenListST = allWallets.filter(i => !i.symbol.includes('/')).map(i => (
+            {
+                ...i,
+                symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
+            })
+        );
+
+        localStorage.setItem('tokenList', JSON.stringify(tokenListST));
+        localStorage.setItem('liquidityList', JSON.stringify(liquidityListST));
+        dispatch(setTokenList(tokenListST));
+        dispatch(setLiquidityList(liquidityListST));
+        // setAT(toArray(tokenListST, liquidityListST))
+    }
 },[])
+
+
+
+
     function handleClose() {
         return dispatch(hideClientWalletsFromSelect())
     }
