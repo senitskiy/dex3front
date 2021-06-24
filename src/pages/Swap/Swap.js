@@ -59,8 +59,15 @@ if(!pairsList || !pairId){
 
   const rate = useSelector(state => state.swapReducer.rate);
 
-  function handleConfirm() {
+    const [incorrectBalance,setincorrectBalance] = useState(false)
 
+  function handleConfirm() {
+    if(fromValue > fromToken.balance){
+        console.log("return",fromValue, "____", fromToken.balance)
+        setincorrectBalance(true)
+        setTimeout(() => setincorrectBalance(false), 200);
+        return
+    }
 
     if(fromToken.symbol && toToken.symbol && fromValue) {
       // if(fromValue > fromToken.balance ) {
@@ -116,8 +123,8 @@ if(!pairsList || !pairId){
                 symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
               })
           );
-          localStorage.setItem('tokenList', JSON.stringify(tokenList));
-          localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
+          //localStorage.setItem('tokenList', JSON.stringify(tokenList));
+          //localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
           dispatch(setTokenList(tokenList));
           dispatch(setLiquidityList(liquidityList));
         }
@@ -172,7 +179,7 @@ if(!pairsList || !pairId){
                 text={'From'}
                 token={fromToken}
                 value={fromValue}
-                // readOnly={readable}
+                incorrectBalance={incorrectBalance}
               />
               <SwapBtn
                 fromToken={fromToken}

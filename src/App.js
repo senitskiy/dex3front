@@ -133,8 +133,8 @@ console.log("pubKey2",pubKey2)
             symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
           })
       );
-      localStorage.setItem('tokenList', JSON.stringify(tokenList));
-      localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
+      //localStorage.setItem('tokenList', JSON.stringify(tokenList));
+      //localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
       dispatch(setTokenList(tokenList));
       dispatch(setLiquidityList(liquidityList));
     }
@@ -157,8 +157,9 @@ console.log("pubKey2",pubKey2)
   useEffect(async () => {
       // setonloading(true)
     if(subscribeData.dst) {
-      const clientBalance = await getClientBalance(pubKey.address);
-console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey.address)
+        const pubKey2 = await checkPubKey(curExt._extLib.pubkey)
+      const clientBalance = await getClientBalance(pubKey2.dexclient);
+console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey2.dexclient)
       let item = localStorage.getItem("currentElement");
       if(transactionsList[item]) transactionsList[item].toValue = subscribeData.amountOfTokens / 1e9;
       if (transactionsList.length) dispatch(setTransactionsList(transactionsList));
@@ -166,6 +167,7 @@ console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey.ad
       let tokenList = await getAllClientWallets(pubKey.address);
       console.log("tokenList after WEBH",tokenList)
       let liquidityList = [];
+      console.log(9999395394583590, tokenList)
       if(tokenList.length) {
         tokenList.forEach(async item => await subscribe(item.walletAddress));
 

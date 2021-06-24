@@ -79,6 +79,8 @@ function Input(props) {
   //   changeValue(revertValue);
   // }, [revertValue])
 
+
+
   async function handleClick() {
     try {
       if(location.pathname.includes('swap')) {
@@ -103,27 +105,25 @@ function Input(props) {
     if(location.pathname.includes('swap')) {
       if(props.type === 'from') {
         console.log("hange vvalue",props.token.balance)
-        if(curValue && value > curValue) {
-          let val = Number(curValue) * swapRate;
-          let val1 = 0;
-          if(val < 0.0001) val1 = parseFloat(val.toFixed(8))
-          else val1 = parseFloat(val.toFixed(4))
+        // if(curValue && value > curValue) {
+          let val = Number(value) * swapRate;
+          val < 0.0001 ? val = parseFloat(val.toFixed(8)) : val = parseFloat(val.toFixed(4))
 
-          let val2 = Number(curValue)
-          if(val2 < 0.0001) val2 = parseFloat(Number(curValue).toFixed(8))
-          else val2 = parseFloat(Number(curValue).toFixed(4))
+
+          let val2 = Number(value)
+          val2 < 0.0001 ? val2 = parseFloat(Number(value).toFixed(8)) : val2 = parseFloat(Number(value).toFixed(4))
           dispatch(setSwapFromInputValue(val2));
           dispatch(setSwapToInputValue(val));
           console.log("val2",val2)
-        }
-        else  {
-          dispatch(setSwapFromInputValue(value));
-          let val = value * swapRate;
-          let val1 = 0;
-          if(val < 0.0001) val1 = parseFloat(val.toFixed(8))
-          else val1 = parseFloat(val.toFixed(4))
-          dispatch(setSwapToInputValue(val1));
-        }
+        // }
+        // else  {
+        //   dispatch(setSwapFromInputValue(value));
+        //   let val = value * swapRate;
+        //   let val1 = 0;
+        //   if(val < 0.0001) val1 = parseFloat(val.toFixed(8))
+        //   else val1 = parseFloat(val.toFixed(4))
+        //   dispatch(setSwapToInputValue(val1));
+        // }
 
       // } else if(props.type === 'to') {
         // dispatch(setSwapToInputValue(value));
@@ -149,10 +149,9 @@ function Input(props) {
     setValue(changer)
   },[changer])
   useEffect(()=>{
-console.log("revertValue!!!",revertValue)
+
     setValue(revertValue)
   },[revertValue])
-
 
 
   return (
@@ -160,8 +159,9 @@ console.log("revertValue!!!",revertValue)
       <div className="input">
         <div className="input-wrapper">
           <span className="input-title">{props.text}</span>
-          <span className="input-balance">{(walletIsConnected && props.token.symbol) && `Balance: ${
-            props.token.balance < 0.0001 ? parseFloat(props.token.balance.toFixed(8)) : parseFloat(props.token.balance.toFixed(4))}
+          <span className={props.incorrectBalance ? "input-balance incorBalance " : "input-balance"}>{(walletIsConnected && props.token.symbol) && `Balance: ${
+            props.token.balance < 0.0001 ? parseFloat(props.token.balance.toFixed(8)) : parseFloat(props.token.balance.toFixed(4))
+          }
             `}</span>
         </div>
         <div className="input-wrapper">

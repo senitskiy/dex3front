@@ -24,17 +24,17 @@
       }
     }
   }
-  
+
   &-wrapper {
     display: flex;
   }
-  
+
   img {
     width: 32px;
     height: 32px;
     margin-right: 12px;
   }
-  
+
   &-title {
     font-size: 24px;
     font-weight: 700;
@@ -42,7 +42,7 @@
     margin: 0;
     transition: .0s;
   }
-  
+
   &-descr {
     font-size: 16px;
     margin: 0;
@@ -63,4 +63,8 @@
       font-size: 20px;
     }
   }
+}
+
+.incorBalance{
+  color:red
 }
