@@ -191,6 +191,7 @@ if(!pairsList || !pairId){
                 text={toValue > 0 ? <>To <span>(estimated)</span></> : 'To'}
                 token={toToken}
                 value={toValue}
+                incorrectBalance={false}
 
               />
               { walletIsConnected ?

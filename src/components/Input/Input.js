@@ -153,13 +153,24 @@ function Input(props) {
     setValue(revertValue)
   },[revertValue])
 
+  const [incorrectValue, setIncorrect] = useState(false)
+  useEffect(()=>{
+    if(props.type === "to"){
+      console.log("props.incorrectBalanceToValue",props.incorrectBalanceToValue)
+      setIncorrect(props.incorrectBalanceToValue)
+
+    }else{
+      console.log("props.incorrectBalance",props.incorrectBalance)
+      setIncorrect(props.incorrectBalance)
+    }
+  },[props.incorrectBalanceToValue,props.incorrectBalance])
 
   return (
     <>
       <div className="input">
         <div className="input-wrapper">
           <span className="input-title">{props.text}</span>
-          <span className={props.incorrectBalance ? "input-balance incorBalance " : "input-balance"}>{(walletIsConnected && props.token.symbol) && `Balance: ${
+          <span className={incorrectValue ? "input-balance incorBalance " : "input-balance"}>{(walletIsConnected && props.token.symbol) && `Balance: ${
             props.token.balance < 0.0001 ? parseFloat(props.token.balance.toFixed(8)) : parseFloat(props.token.balance.toFixed(4))
           }
             `}</span>
