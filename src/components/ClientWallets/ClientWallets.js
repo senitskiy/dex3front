@@ -17,7 +17,7 @@ function ClientWallets(props) {
     const [filter, setFilter] = useState('');
 
     const wallet = useSelector(state => state.walletReducer.wallet);
-
+    const walletIsConnected = useSelector(state => state.appReducer.walletIsConnected);
     const tokenList = useSelector(state => state.walletReducer.tokenList);
     const LPTokenList = useSelector(state => state.walletReducer.liquidityList);
 console.log("tokenList",tokenList,"LPTokenList",LPTokenList)
@@ -46,12 +46,18 @@ console.log("tokenList",tokenList,"LPTokenList",LPTokenList)
 
     //console.log(LPTokenList);
 useEffect(()=>{
+    if(!walletIsConnected){
+        return
+    }
     setAT(toArray(tokenList, LPTokenList))
 console.log("--------------------",tokenList,LPTokenList)
 
 },[tokenList,LPTokenList])
 
 useEffect(async ()=>{
+    if(!walletIsConnected){
+        return
+    }
     let allWallets = await getAllClientWallets(wallet && wallet.id)
     if(allWallets.length > (tokenList.length + LPTokenList.length)){
 

@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { useHistory } from 'react-router';
 import { useSelector, useDispatch } from 'react-redux';
-import { connectWallet, setCurExt, showPopup } from '../../store/actions/app';
+import {connectWallet, setCurExt, setExtensionsList, showPopup} from '../../store/actions/app';
 import {checkExtensions, getCurrentExtension} from '../../extensions/extensions/checkExtensions';
 import  extratonIcon from '../../extensions/extratonIcon.png'
 import  broxusIcon from '../../extensions/broxusIcon.png'
@@ -36,6 +36,8 @@ function ExtensionsList() {
   //   }
   // },[])
   function handleClick(name) {
+   // let checkEX = await checkExtensions()
+   //  console.log("checkEX",checkEX)
     extensionsList.forEach(async i => {
       if(i.name === name) {
         if(i.available) {

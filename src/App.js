@@ -58,20 +58,23 @@ const [onloading,setonloading] = useState(false)
     if(appTheme !== theme) dispatch(changeTheme(theme));
 
     const extensionsList = await checkExtensions();
-
+      console.log("extensionsList",extensionsList)
     dispatch(setExtensionsList(extensionsList));
 
+      let extensionsListBothNotAvaile = extensionsList.filter(item=>item.available === true)
 
+      console.log("extensionsListBothNotAvaile",extensionsListBothNotAvaile)
+      if(extensionsListBothNotAvaile.length === 0){
+          const pairs = await getAllPairsWoithoutProvider();
 
-
-
-    const curExtname = localStorage.getItem('extName') === null ? {} : localStorage.getItem('extName');
+          dispatch(setPairsList(pairs));
+          setonloading(false)
+          return
+      }
+// console.log((localStorage.getItem('extName') === null || !localStorage.getItem('extName').length))
+    const curExtname = (localStorage.getItem('extName') === null || !localStorage.getItem('extName').length) ? extensionsListBothNotAvaile[0].name : localStorage.getItem('extName');
     let curExtt = await getCurrentExtension(curExtname)
-
-
-    console.log("curExtt",curExtt._extLib.pubkey)
-
-      const pubKey2 = await checkPubKey(curExtt._extLib.pubkey)
+    const pubKey2 = await checkPubKey(curExtt._extLib.pubkey)
 
 
 
@@ -79,11 +82,10 @@ const [onloading,setonloading] = useState(false)
           setonloading(false)
           return
       }
-console.log("pubKey2",pubKey2)
+
     if(pubKey2.status){
       dispatch(setPubKey(pubKey2));
-      // history.push("/Account")
-        dispatch(setCurExt(curExtt));
+      dispatch(setCurExt(curExtt));
     }
 
 

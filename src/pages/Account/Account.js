@@ -37,6 +37,7 @@ function Account() {
     dispatch(setLiquidityList([]));
     localStorage.setItem('tokenList', JSON.stringify({}));
     localStorage.setItem('liquidityList', JSON.stringify({}));
+    localStorage.removeItem("liquidityList");
     localStorage.setItem('pubKey', JSON.stringify({}));
     localStorage.setItem('wallet', JSON.stringify({}));
     // dispatch(setTransactionsList([]));

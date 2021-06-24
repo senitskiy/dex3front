@@ -45,7 +45,8 @@ function ConnectWallet() {
                 }
             }
                 let dexCLientStatus = await setCreator(curExt);
-            if(dexCLientStatus && dexCLientStatus.code){
+            console.log("dexCLientStatus",dexCLientStatus)
+            if((dexCLientStatus && dexCLientStatus.code) || !dexCLientStatus.status){
                 dispatch(closeConnecting());
                 dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
                 dispatch(setCurExt(""));

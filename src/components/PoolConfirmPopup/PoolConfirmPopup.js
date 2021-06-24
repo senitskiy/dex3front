@@ -34,7 +34,7 @@ function PoolConfirmPopup(props) {
       let poolStatus = await processLiquidity(curExt, pairId, fromValue * 1000000000, toValue * 1000000000);
     console.log("pairId",pairId)
       console.log("poolStatus",poolStatus)
-    if(!poolStatus || (poolStatus && (poolStatus.code === 1000))){
+    if(!poolStatus || (poolStatus && (poolStatus.code === 1000 || poolStatus.code === 3))){
       dispatch(setPoolAsyncIsWaiting(false))
     }
 

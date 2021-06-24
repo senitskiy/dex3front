@@ -86,7 +86,7 @@ function SwapConfirmPopup(props) {
         await pairsList.forEach(async i => {
           if(fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
             let res = await swapA(curExt, pairId, fromValue * 1000000000);
-            if(!res || (res && (res.code === 1000))){
+            if(!res || (res && (res.code === 1000 || res.code === 3))){
               dispatch(setSwapAsyncIsWaiting(false))
             }
 
@@ -117,7 +117,7 @@ function SwapConfirmPopup(props) {
             // }
 
             //user cancalled for both broxus & extraton
-            if(!res || (res && (res.code === 1000))){
+            if(!res || (res && (res.code === 1000 || res.code === 3))){
               dispatch(setSwapAsyncIsWaiting(false))
             }
 

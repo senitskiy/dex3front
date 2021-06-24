@@ -62,6 +62,7 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
     let walletAddr
     while (!status) {
         let response = await accClient.runLocal("getConnectorAddress", {_answer_id: 0, connectorSoArg: n})
+        console.log("response",response)
         connectorAddr = response.decoded.output.value0;
         shardC = getShardThis(connectorAddr);
         if (shardC === targetShard) {
@@ -101,6 +102,7 @@ export async function getRootBalanceOF() {
         const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
 
         let RootbalanceOf = await RootContract.runLocal("balanceOf", {})
+
         return RootbalanceOf.decoded.output
     } catch (e) {
         console.log("catch E", e);
@@ -337,6 +339,12 @@ export async function subscribe(address) {
                 console.log("from giver",params)
                 return
             }
+            if(decoded.name === "burnByOwner") {
+                let caseID3 = await checkMessagesAmount({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
+                setTimeout(()=>store.dispatch(setSubscribeData(caseID3)),5000)
+                return
+            }
+
 
             if(decoded.name === "accept"){
                 console.log("decoded.name",{transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
@@ -377,7 +385,44 @@ export async function getPairsTotalSupply(pairAddress) {
         return e
     }
 }
-
+export async function pairs(clientAddress) {
+    const acc = new Account(DEXclientContract, {address: clientAddress, client});
+    try{
+        const response = await acc.runLocal("pairs", {});
+        let pairsC = response.decoded.output.pairs;
+        console.log("pairs",pairsC)
+        return pairsC
+    } catch (e) {
+        console.log("catch E", e);
+        return e
+    }
+}
+export async function getsoUINT(clientAddress) {
+    console.log("clientAddress",clientAddress)
+    const acc = new Account(DEXclientContract, {address: clientAddress, client});
+    try{
+        console.log("sstrt")
+        const response = await acc.runLocal("soUINT", {});
+        console.log("response",response)
+        let soUINTC = response.decoded.output.soUINT;
+        console.log("soUINTC",soUINTC)
+        return soUINTC
+    } catch (e) {
+        console.log("catch E", e);
+        return e
+    }
+}
+export async function getAllDataPrep(clientAddress) {
+    const acc = new Account(DEXclientContract, {address: clientAddress, client});
+    try{
+        const response = await acc.runLocal("getAllDataPreparation", {});
+        console.log("response get all data",response)
+        return response.decoded.output;
+    } catch (e) {
+        console.log("catch E", e);
+        return e
+    }
+}
 
 
 export async function getAllDataPreparation(clientAddress) {
