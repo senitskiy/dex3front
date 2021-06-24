@@ -156,7 +156,7 @@ console.log("pubKey2",pubKey2)
 
   useEffect(async () => {
       // setonloading(true)
-    if(subscribeData.dst) {
+    if(subscribeData && subscribeData.dst) {
         const pubKey2 = await checkPubKey(curExt._extLib.pubkey)
       const clientBalance = await getClientBalance(pubKey2.dexclient);
 console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey2.dexclient)

@@ -47,7 +47,7 @@ console.log("tokenList",tokenList,"LPTokenList",LPTokenList)
     //console.log(LPTokenList);
 useEffect(()=>{
     setAT(toArray(tokenList, LPTokenList))
-
+console.log("--------------------",tokenList,LPTokenList)
 
 },[tokenList,LPTokenList])
 

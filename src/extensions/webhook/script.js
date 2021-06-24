@@ -339,8 +339,9 @@ export async function subscribe(address) {
             }
 
             if(decoded.name === "accept"){
-                console.log("decoded.name",decoded)
-                setTimeout(()=>store.dispatch(setSubscribeData({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens:  decoded.value ? decoded.value.tokens : 0})),2000)
+                console.log("decoded.name",{transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
+                let caseID2 = await checkMessagesAmount({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
+                setTimeout(()=>store.dispatch(setSubscribeData(caseID2)),10000)
                 return
             }
 console.log("decoded",decoded,"params",params)
