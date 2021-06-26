@@ -46,10 +46,10 @@ function Swap () {
     const [readable, setreadable] = useState(false);
 
   useEffect(()=>{
-if(!pairsList || !pairId){
-  console.log("pairsList CKECK 0",pairsList)
-  return
-}
+    if(!pairsList || !pairId){
+      console.log("pairsList CKECK 0",pairsList)
+      return
+    }
    let curePairData = pairsList.filter(item=>item.pairAddress===pairId)
     setExistsPair(curePairData[0].exists)
     setCurrentPair(curePairData)
@@ -139,8 +139,12 @@ if(!pairsList || !pairId){
 
           return <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button>
       }else if(!curExist && fromToken.symbol && toToken.symbol){
-              console.log(2)
-
+              console.log(2,curExist)
+              console.log("curExist" + curExist)
+              console.log("fromToken.symbol" + fromToken.symbol)
+              console.log("toToken.symbol" + toToken.symbol)
+              console.log("walletIsConnected" + walletIsConnected)
+              
               return <button className={(fromToken.symbol && toToken.symbol) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConnectPair()}>Connect pair</button>
       }
       console.log(3)
