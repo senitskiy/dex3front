@@ -68,8 +68,10 @@ function ConnectWallet() {
             let arrPairs = [];
             await pairs.map(async item=>{
                 item.exists = await checkClientPairExists(pubKey.dexclient, item.pairAddress)
+                console.log("item.exists" + item.exists)
                 arrPairs.push(item)
             })
+            console.log("arrPairs:" + arrPairs)        
             dispatch(setPairsList(arrPairs));
 
 

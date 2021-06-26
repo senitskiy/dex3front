@@ -144,7 +144,9 @@ export async function checkClientPairExists(clientAddress,pairAddress) {
 
         let newArr = clientPairs.filter(item => item === pairAddress
         );
+        console.log("newArr.length", newArr.length !== 0);
         return newArr.length !== 0;
+        
     } catch (e) {
         console.log("catch E", e);
         return e
