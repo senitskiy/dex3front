@@ -170,6 +170,32 @@ function SwapConfirmPopup(props) {
     }
   }
 
+
+  function getAmountOut(amountIn) {
+    if(!amountIn){
+      return 0
+    }
+    let reserves = pairsList.filter(item=>item.pairAddress === pairId)
+    let rootIn = 0
+    let rootOut = 0
+    pairsList.forEach(async i => {
+    if(fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
+      rootIn = reserves[0].reserveA
+      rootOut = reserves[0].reservetB
+    }else{
+      rootIn = reserves[0].reserveA
+      rootOut = reserves[0].reservetB
+    }
+    })
+
+    console.log("rootIn",rootIn,"amountIn",amountIn,"rootOut",rootOut)
+    let amountInWithFee = amountIn * 997;
+    let numerator = amountInWithFee * rootOut;
+    let denominator = amountInWithFee + rootIn * 1000;
+    return (numerator/denominator);
+    // return 1;
+  }
+
   return (
     <div className="popup-wrapper">
       <MainBlock
@@ -206,7 +232,7 @@ function SwapConfirmPopup(props) {
               <span className="confirm-value"><img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol}/>{toValue < 0.0001 ? parseFloat(toValue.toFixed(8)) : parseFloat(toValue.toFixed(4))}</span>
             </div>
             <p className="confirm-text">
-              Output is estimated. You will receive at least <span>{toValue < 0.0001 ? parseFloat(toValue.toFixed(8)) : parseFloat(toValue.toFixed(4))} {toToken.symbol}</span> or the transaction will revert
+              Output is estimated. You will receive at least <span>{toValue < 0.0001 ? parseFloat(getAmountOut(toValue).toFixed(8)) : parseFloat(getAmountOut(toValue).toFixed(4))} {toToken.symbol}</span> or the transaction will revert
             </p>
             <button className="btn popup-btn" onClick={() => handleSwap()}>Confirm Swap</button>
           </>

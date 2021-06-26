@@ -140,16 +140,66 @@ export async function checkClientPairExists(clientAddress,pairAddress) {
     const acc = new Account(DEXclientContract, {address: clientAddress, client});
     try{
         const response = await acc.runLocal("getAllDataPreparation", {});
+        const response2 = await acc.runLocal("rootWallet", {});
         let clientPairs = response.decoded.output.pairKeysR
-
-        let newArr = clientPairs.filter(item => item === pairAddress
-        );
+        console.log("getAllDataPreparation1",response.decoded.output)
+        console.log("getAllDataPreparation2",response2.decoded.output)
+        let newArr = clientPairs.filter(item => item === pairAddress);
         return newArr.length !== 0;
     } catch (e) {
         console.log("catch E", e);
         return e
     }
 }
+
+
+/**
+ * Function to check wallet exists by pair
+ * @author   max_akkerman
+ * @param   {string} clientAddress
+ * @return   [{walletAddress:string,symbol:string,balance:number}]
+ */
+
+export async function checkwalletExists(clientAddress,pairAddress) {
+    const acc = new Account(DEXclientContract, {address: clientAddress, client});
+    const pairContract = new Account(DEXPairContract, {address:pairAddress, client});
+    try{
+        const respRootWallets = await acc.runLocal("rootWallet", {});
+
+        const respRootA = await pairContract.runLocal("rootA", {});
+        const respRootB = await pairContract.runLocal("rootB", {});
+        const respRootAB = await pairContract.runLocal("rootAB", {});
+
+        let clientRoots = respRootWallets.decoded.output.rootWallet
+        let rootA = respRootA.decoded.output.rootA
+        let rootB = respRootB.decoded.output.rootB
+        let rootAB = respRootAB.decoded.output.rootAB
+
+        let checkedArr = [
+            {
+                status: !!clientRoots[rootA],
+                walletAaddress: rootA,
+            },{
+                status: !!clientRoots[rootB],
+                walletBaddress: rootB,
+            },{
+                status: !!clientRoots[rootAB],
+                walletABaddress: rootAB,
+            }
+            ]
+
+
+                                console.log("checkedObj",checkedArr)
+        return checkedArr
+        // let newArr = clientPairs.filter(item => item === pairAddress);
+        // return newArr.length !== 0;
+    } catch (e) {
+        console.log("catch E", e);
+        return e
+    }
+}
+
+
 
 /**
  * Function to get client wallets
@@ -245,8 +295,10 @@ export async function getAllPairsWoithoutProvider() {
 
         itemData.rateAB = +bal.decoded.output.balanceReserve[item[1].root1] / +bal.decoded.output.balanceReserve[item[1].root0]
         itemData.rateBA = +bal.decoded.output.balanceReserve[item[1].root0] / +bal.decoded.output.balanceReserve[item[1].root1]
-        normlizeWallets.push(itemData)
         itemData.totalSupply = await getPairsTotalSupply(item[0])
+        normlizeWallets.push(itemData)
+        console.log("normlizeWallets!!normlizeWallets",normlizeWallets)
+
     }
     return normlizeWallets
 
