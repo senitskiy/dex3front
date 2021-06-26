@@ -10,6 +10,7 @@ import { iconGenerator } from '../../iconGenerator';
 import miniSwap from '../../images/icons/mini-swap.png';
 import { checkClientPairExists, getAllClientWallets, subscribe } from '../../extensions/webhook/script';
 import './SwapConfirmPopup.scss';
+import {setManageAsyncIsWaiting} from "../../store/actions/manage";
 
 function SwapConfirmPopup(props) {
   const dispatch = useDispatch();
@@ -37,63 +38,60 @@ function SwapConfirmPopup(props) {
     props.hideConfirmPopup();
 
     let pairIsConnected = await checkClientPairExists(pubKey.address, pairId);
-    if(!pairIsConnected) {
-      try {
-        let connectRes = await connectToPair(curExt, pairId);
-        let tokenList = await getAllClientWallets(pubKey.address);
-        let countT = tokenList.length
-        let y = 0
-        while(tokenList.length < countT){
-
-          tokenList = await getAllClientWallets(pubKey.address);
-          y++
-          if(y>500){
-            dispatch(showPopup({type: 'error', message: 'Oops, too much time for deploying. Please connect your wallet again.'}));
-          }
-        }
-
-        dispatch(setTokenList(tokenList));
-
-
-        let liquidityList = [];
-
-        if(tokenList.length) {
-          tokenList.forEach(async item => await subscribe(item.walletAddress));
-
-          liquidityList = tokenList.filter(i => i.symbol.includes('/'));
-
-          tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
-              {
-                ...i,
-                symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
-              })
-          );
-          localStorage.setItem('tokenList', JSON.stringify(tokenList));
-          localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
-          dispatch(setTokenList(tokenList));
-          dispatch(setLiquidityList(liquidityList));
-        }
-        dispatch(setSwapAsyncIsWaiting(false));
-        pairIsConnected = true;
-      } catch(e) {
-        dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-      }
-    }
+    // if(!pairIsConnected) {
+    //   try {
+    //     let connectRes = await connectToPair(curExt, pairId);
+    //     let tokenList = await getAllClientWallets(pubKey.address);
+    //     let countT = tokenList.length
+    //     let y = 0
+    //     while(tokenList.length < countT){
+    //
+    //       tokenList = await getAllClientWallets(pubKey.address);
+    //       y++
+    //       if(y>500){
+    //         dispatch(showPopup({type: 'error', message: 'Oops, too much time for deploying. Please connect your wallet again.'}));
+    //       }
+    //     }
+    //
+    //     dispatch(setTokenList(tokenList));
+    //
+    //
+    //     let liquidityList = [];
+    //
+    //     if(tokenList.length) {
+    //       tokenList.forEach(async item => await subscribe(item.walletAddress));
+    //
+    //       liquidityList = tokenList.filter(i => i.symbol.includes('/'));
+    //
+    //       tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
+    //           {
+    //             ...i,
+    //             symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
+    //           })
+    //       );
+    //       localStorage.setItem('tokenList', JSON.stringify(tokenList));
+    //       localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
+    //       dispatch(setTokenList(tokenList));
+    //       dispatch(setLiquidityList(liquidityList));
+    //     }
+    //     dispatch(setSwapAsyncIsWaiting(false));
+    //     pairIsConnected = true;
+    //   } catch(e) {
+    //     dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+    //   }
+    // }
 
     if(pairIsConnected) {
       try {
         await pairsList.forEach(async i => {
           if(fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
             let res = await swapA(curExt, pairId, fromValue * 1000000000);
-            if(res.code) {
-              if(res.code === 1000) {
-                dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-              }
-              else {
-                dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-              }
+            if(!res || (res && (res.code === 1000 || res.code === 3))){
+              dispatch(setSwapAsyncIsWaiting(false))
             }
-            if(!res.code) {
+
+
+            if(res && !res.code) {
               let olderLength = transactionsList.length;
               let newLength = transactionsList.push({
                 type: "swap",
@@ -106,22 +104,34 @@ function SwapConfirmPopup(props) {
               localStorage.setItem("currentElement", item);
               localStorage.setItem("lastType", "swap");
               if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
+
             }else{
               dispatch(setSwapAsyncIsWaiting(false))
+
             }
           } else if(fromToken.symbol === i.symbolB && toToken.symbol === i.symbolA) {
             let res = await swapB(curExt, pairId, fromValue * 1000000000);
-            if(res.code) {
-              if(res.code === 1000) {
-                dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-                dispatch(setSwapAsyncIsWaiting(false));
-              }
-              else {
-                dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-                dispatch(setSwapAsyncIsWaiting(false));
-              }
+            // if(!res){
+            //   dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+            //   dispatch(setSwapAsyncIsWaiting(false));
+            // }
+
+            //user cancalled for both broxus & extraton
+            if(!res || (res && (res.code === 1000 || res.code === 3))){
+              dispatch(setSwapAsyncIsWaiting(false))
             }
-            if(!res.code) {
+
+            // if(res && res.code) {
+            //   if(res.code === 1000) {
+            //     dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+            //     dispatch(setSwapAsyncIsWaiting(false));
+            //   }
+            //   else {
+            //     dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+            //     dispatch(setSwapAsyncIsWaiting(false));
+            //   }
+            // }
+            if(res && !res.code) {
               let olderLength = transactionsList.length;
               let newLength = transactionsList.push({
                 type: "swap",
@@ -130,12 +140,15 @@ function SwapConfirmPopup(props) {
                 toValue: null,
                 toSymbol: toToken.symbol
               })
-              let item = (newLength - olderLength) - 1
+              let item = newLength - 1
               localStorage.setItem("currentElement", item);
               localStorage.setItem("lastType", "swap");
               if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
+
             }else{
               dispatch(setSwapAsyncIsWaiting(false))
+
+
             }
           }
         })
@@ -190,10 +203,10 @@ function SwapConfirmPopup(props) {
                   </defs>
                 </svg>
               }
-              <span className="confirm-value"><img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol}/>{parseFloat(toValue.toFixed(4))}</span>
+              <span className="confirm-value"><img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol}/>{toValue < 0.0001 ? parseFloat(toValue.toFixed(8)) : parseFloat(toValue.toFixed(4))}</span>
             </div>
             <p className="confirm-text">
-              Output is estimated. You will receive at least <span>{parseFloat(toValue.toFixed(4))} {toToken.symbol}</span> or the transaction will revert
+              Output is estimated. You will receive at least <span>{toValue < 0.0001 ? parseFloat(toValue.toFixed(8)) : parseFloat(toValue.toFixed(4))} {toToken.symbol}</span> or the transaction will revert
             </p>
             <button className="btn popup-btn" onClick={() => handleSwap()}>Confirm Swap</button>
           </>
@@ -203,11 +216,11 @@ function SwapConfirmPopup(props) {
             <div className="mainblock-footer-wrap">
               {/*<div>*/}
                 <div className="swap-confirm-wrap">
-                  <p className="mainblock-footer-value"><img src={miniSwap} alt=""/> {parseFloat(rate.toFixed(4))} {toToken.symbol}/{fromToken.symbol}</p>
+                  <p className="mainblock-footer-value"><img src={miniSwap} alt=""/> {rate < 0.0001 ? parseFloat(rate.toFixed(8)) : parseFloat(rate.toFixed(4))} {toToken.symbol}/{fromToken.symbol}</p>
                   <p className="mainblock-footer-subtitle">Price</p>
                 </div>
                 <div className="swap-confirm-wrap">
-                  <p className="mainblock-footer-value">{(fromValue * 0.03) / 100} {fromToken.symbol}</p>
+                  <p className="mainblock-footer-value">{((fromValue * 0.3) / 100).toFixed((fromValue > 0.0001) ? 4 : 6)} {fromToken.symbol}</p>
                   <p className="mainblock-footer-subtitle">Liquidity Provider Fee</p>
                 </div>
                 {/*<div>*/}

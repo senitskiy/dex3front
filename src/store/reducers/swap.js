@@ -1,4 +1,5 @@
 import {
+  SET_SWAP_FROM_INPUT_VALUE_CHANGE,
   SET_SWAP_FROM_INPUT_VALUE,
   SET_SWAP_TO_INPUT_VALUE,
   SET_SWAP_FROM_TOKEN,
@@ -29,7 +30,8 @@ const initialState = {
   pairId: '',
   swapFromSelectIsVisible: false,
   swapToSelectIsVisible: false,
-  swapAsyncIsWaiting: false
+  swapAsyncIsWaiting: false,
+  revertValue: 0
 };
 
 const swapReducer = (state = initialState, { type, payload }) => {
@@ -38,6 +40,11 @@ const swapReducer = (state = initialState, { type, payload }) => {
       return {
         ...state,
         fromInputValue: payload
+      }
+    case SET_SWAP_FROM_INPUT_VALUE_CHANGE:
+      return {
+        ...state,
+        revertValue: payload
       }
     case SET_SWAP_TO_INPUT_VALUE:
       return {

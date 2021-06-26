@@ -3,16 +3,16 @@ import {useSelector, useDispatch} from 'react-redux';
 import {Switch, Route, Redirect, useLocation, useHistory} from 'react-router-dom';
 import {changeTheme, setCurExt, setExtensionsList, setWalletIsConnected, showPopup} from './store/actions/app';
 import {setLiquidityList, setPairsList, setPubKey, setSubscribeData, setTokenList, setTransactionsList, setWallet} from './store/actions/wallet';
-import {
-  checkClientPairExists,
-  checkPubKey,
-  getAllClientWallets,
-  getAllPairsWoithoutProvider,
-  getClientBalance,
-  subscribe
-} from './extensions/webhook/script';
+import { getAllClientWallets, getAllPairsWoithoutProvider, getClientBalance,checkPubKey, subscribe,checkClientPairExists } from './extensions/webhook/script';
 import { checkExtensions, getCurrentExtension } from './extensions/extensions/checkExtensions';
-import { setSwapAsyncIsWaiting, setSwapFromInputValue, setSwapFromToken, setSwapToInputValue, setSwapToToken } from './store/actions/swap';
+import {
+    setSwapAsyncIsWaiting,
+    setSwapFromInputValue,
+    setSwapFromInputValueChange,
+    setSwapFromToken,
+    setSwapToInputValue,
+    setSwapToToken
+} from './store/actions/swap';
 import { setPoolAsyncIsWaiting, setPoolFromInputValue, setPoolFromToken, setPoolToInputValue, setPoolToToken } from './store/actions/pool';
 import { setManageAsyncIsWaiting, setManageBalance, setManageFromToken, setManagePairId, setManageRateAB, setManageRateBA, setManageToToken } from './store/actions/manage';
 import Account from './pages/Account/Account';
@@ -38,6 +38,7 @@ function App() {
   const liquidityList = useSelector(state => state.walletReducer.liquidityList);
 
 
+const [onloading,setonloading] = useState(false)
   const manageAsyncIsWaiting = useSelector(state => state.manageReducer.manageAsyncIsWaiting);
   const subscribeData = useSelector(state => state.walletReducer.subscribeData);
   const curExt = useSelector(state => state.appReducer.curExt);
@@ -52,29 +53,39 @@ function App() {
   }
 
   useEffect(async () => {
+      setonloading(true)
     const theme = localStorage.getItem('appTheme') === null ? 'light' : localStorage.getItem('appTheme');
     if(appTheme !== theme) dispatch(changeTheme(theme));
 
     const extensionsList = await checkExtensions();
-
+      console.log("extensionsList",extensionsList)
     dispatch(setExtensionsList(extensionsList));
 
-    const curExtname = localStorage.getItem('extName') === null ? {} : localStorage.getItem('extName');
+      let extensionsListBothNotAvaile = extensionsList.filter(item=>item.available === true)
+
+      console.log("extensionsListBothNotAvaile",extensionsListBothNotAvaile)
+      if(extensionsListBothNotAvaile.length === 0){
+          const pairs = await getAllPairsWoithoutProvider();
+
+          dispatch(setPairsList(pairs));
+          setonloading(false)
+          return
+      }
+// console.log((localStorage.getItem('extName') === null || !localStorage.getItem('extName').length))
+    const curExtname = (localStorage.getItem('extName') === null || !localStorage.getItem('extName').length) ? extensionsListBothNotAvaile[0].name : localStorage.getItem('extName');
     let curExtt = await getCurrentExtension(curExtname)
-    dispatch(setCurExt(curExtt));
-
-    console.log("curExtt",curExtt._extLib.pubkey)
+    const pubKey2 = await checkPubKey(curExtt._extLib.pubkey)
 
 
-    const pubKey2 =
-        // localStorage.getItem('pubKey') === null ?
-        await checkPubKey(curExtt._extLib.pubkey)
-        // :
-        // JSON.parse(localStorage.getItem('pubKey'));
-console.log("pubKey2",pubKey2)
+
+      if(!pubKey2.status){
+          setonloading(false)
+          return
+      }
+
     if(pubKey2.status){
       dispatch(setPubKey(pubKey2));
-      // history.push("/Account")
+      dispatch(setCurExt(curExtt));
     }
 
 
@@ -87,7 +98,6 @@ console.log("pubKey2",pubKey2)
         // :
         // JSON.parse(localStorage.getItem('wallet'));
 
-
     if(wallet.id) {
       dispatch(setWallet(wallet));
       dispatch(setWalletIsConnected(true));
@@ -99,12 +109,11 @@ console.log("pubKey2",pubKey2)
       item.exists = await checkClientPairExists(pubKey2.dexclient, item.pairAddress)
       arrPairs.push(item)
     })
+    dispatch(setPairsList(arrPairs));
 
-    dispatch(setPairsList(pairs));
 
-    const pubKey = localStorage.getItem('pubKey') === null ? {} : JSON.parse(localStorage.getItem('pubKey'));
 
-    if(pubKey.status) dispatch(setPubKey(pubKey));
+
 
     // const tokenList = getAllClientWallets(pubKey.address)
 
@@ -126,8 +135,8 @@ console.log("pubKey2",pubKey2)
             symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
           })
       );
-      localStorage.setItem('tokenList', JSON.stringify(tokenList));
-      localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
+      //localStorage.setItem('tokenList', JSON.stringify(tokenList));
+      //localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
       dispatch(setTokenList(tokenList));
       dispatch(setLiquidityList(liquidityList));
     }
@@ -135,7 +144,8 @@ console.log("pubKey2",pubKey2)
     const transactionsList = localStorage.getItem('transactionsList') === null ? [] : JSON.parse(localStorage.getItem('transactionsList'));
     if(transactionsList.length) dispatch(setTransactionsList(transactionsList));
 
-
+      setonloading(false)
+      console.log("setonloading",onloading)
   }, []);
 
 
@@ -147,15 +157,38 @@ console.log("pubKey2",pubKey2)
   }, [swapAsyncIsWaiting, poolAsyncIsWaiting, manageAsyncIsWaiting]);
 
   useEffect(async () => {
-    if(subscribeData.dst) {
-      const clientBalance = await getClientBalance(pubKey.dexclient);
-
+      // setonloading(true)
+    if(subscribeData && subscribeData.dst) {
+      const pubKey2 = await checkPubKey(curExt._extLib.pubkey)
+      const clientBalance = await getClientBalance(pubKey2.dexclient);
+console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey2.dexclient)
       let item = localStorage.getItem("currentElement");
-      if(transactionsList[item]) transactionsList[item].toValue = subscribeData.amountOfTokens / 1e9;
-      if (transactionsList.length) dispatch(setTransactionsList(transactionsList));
-      dispatch(setWallet({id: pubKey.dexclient, balance: clientBalance}));
+        let lastTransactioType = localStorage.getItem("lastType");
+
+        if(lastTransactioType === "swap") {
+            console.log("item", item, "subscribeData swap", subscribeData, typeof subscribeData.amountOfTokens)
+            if (transactionsList[item]) transactionsList[item].toValue = (Number(subscribeData.amountOfTokens / 1e9));
+            if (transactionsList.length) dispatch(setTransactionsList(transactionsList));
+        }
+        if(lastTransactioType === "processLiquidity") {
+            console.log("item", item, "subscribeData processLiquidity", subscribeData)
+            if (transactionsList[item]) transactionsList[item].lpTokens = (Number(subscribeData.amountOfTokens / 1e9)).toFixed(Number(subscribeData.amountOfTokens / 1e9) <0.0001 ? 6 : 4);
+            if (transactionsList.length) dispatch(setTransactionsList(transactionsList));
+        }
+
+
+
+      dispatch(setWallet({id: pubKey.address, balance: clientBalance}));
+
+
+
+
+
       let tokenList = await getAllClientWallets(pubKey.address);
+      console.log("tokenList after WEBH",tokenList)
       let liquidityList = [];
+      console.log(9999395394583590, tokenList)
+
       if(tokenList.length) {
         tokenList.forEach(async item => await subscribe(item.walletAddress));
 
@@ -167,7 +200,8 @@ console.log("pubKey2",pubKey2)
             symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
           })
         );
-
+          localStorage.setItem('tokenList', JSON.stringify(tokenList));
+          localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
         dispatch(setTokenList(tokenList));
         dispatch(setLiquidityList(liquidityList));
       }
@@ -187,6 +221,7 @@ console.log("pubKey2",pubKey2)
         dispatch(setSwapFromInputValue(0));
         dispatch(setSwapToInputValue(0));
         dispatch(setSwapAsyncIsWaiting(false));
+          dispatch(setSwapFromInputValueChange(0));
       } else if(poolAsyncIsWaiting) {
         dispatch(showPopup({type: 'success', link: subscribeData.transactionID}));
         dispatch(setPoolFromToken({
@@ -220,10 +255,12 @@ console.log("pubKey2",pubKey2)
         history.push('/pool')
       }
     }
+      // setonloading(false)
   }, [subscribeData]);
 
   return (
     <>
+        {onloading && <div className="blockDiv"></div>}
       <div className="beta">Beta version. Use desktop Google Chrome</div>
       <Header />
       <Switch location={location}>

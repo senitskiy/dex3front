@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import { hidePopup, showPopup } from '../../store/actions/app';
@@ -19,6 +19,7 @@ function Input(props) {
 
   const swapFromSelectIsVisible = useSelector(state => state.swapReducer.swapFromSelectIsVisible);
   const swapToSelectIsVisible = useSelector(state => state.swapReducer.swapToSelectIsVisible);
+  const revertValue = useSelector(state => state.swapReducer.revertValue);
 
   const poolFromSelectIsVisible = useSelector(state => state.poolReducer.poolFromSelectIsVisible);
   const poolToSelectIsVisible = useSelector(state => state.poolReducer.poolToSelectIsVisible);
@@ -64,8 +65,20 @@ function Input(props) {
   }, [swapFromToken, swapToToken, poolFromToken, poolToToken, pairsList])
 
   useEffect(() => {
-    changeValue();
+    // if(revertValue){
+    //   console.log("revert", revertValue)
+    //   changeValue(revertValue);
+    // }else{
+      console.log("revert +++++++",props.token.balance)
+      changeValue(props.token.balance);
+    // }
+
   }, [value, swapRate, poolRate])
+
+  // useEffect(() => {
+  //   changeValue(revertValue);
+  // }, [revertValue])
+
 
 
   async function handleClick() {
@@ -88,17 +101,29 @@ function Input(props) {
     }
   }
 
-  function changeValue() {
+  function changeValue(curValue) {
     if(location.pathname.includes('swap')) {
       if(props.type === 'from') {
-        if(props.token.balance && value > props.token.balance) {
-          dispatch(setSwapFromInputValue(Number(props.token.balance).toFixed(4)));
-          dispatch(setSwapToInputValue(parseFloat((Number(props.token.balance) * swapRate).toFixed(4))));
-        }
-        else  {
-          dispatch(setSwapFromInputValue(value));
-          dispatch(setSwapToInputValue(parseFloat((value * swapRate).toFixed(4))));
-        }
+        console.log("hange vvalue",props.token.balance)
+        // if(curValue && value > curValue) {
+          let val = Number(value) * swapRate;
+          val < 0.0001 ? val = parseFloat(val.toFixed(8)) : val = parseFloat(val.toFixed(4))
+
+
+          let val2 = Number(value)
+          val2 < 0.0001 ? val2 = parseFloat(Number(value).toFixed(8)) : val2 = parseFloat(Number(value).toFixed(4))
+          dispatch(setSwapFromInputValue(val2));
+          dispatch(setSwapToInputValue(val));
+          console.log("val2",val2)
+        // }
+        // else  {
+        //   dispatch(setSwapFromInputValue(value));
+        //   let val = value * swapRate;
+        //   let val1 = 0;
+        //   if(val < 0.0001) val1 = parseFloat(val.toFixed(8))
+        //   else val1 = parseFloat(val.toFixed(4))
+        //   dispatch(setSwapToInputValue(val1));
+        // }
 
       // } else if(props.type === 'to') {
         // dispatch(setSwapToInputValue(value));
@@ -107,28 +132,55 @@ function Input(props) {
     } else if(location.pathname.includes('add-liquidity')) {
       if(props.type === 'from') {
         dispatch(setPoolFromInputValue(value));
-        dispatch(setPoolToInputValue(parseFloat((value * poolRate).toFixed(4))));
+        let val = value * poolRate;
+        let val1 = 0;
+        if(val < 0.0001) val1 = parseFloat(val.toFixed(8))
+        else val1 = parseFloat(val.toFixed(4))
+        dispatch(setPoolToInputValue(val1));
       }
     }
   }
-
   function handleKeyPress(event) {
     if(event.key === '-' || event.key === '+') { event.preventDefault() }
   }
+  const [changer,setChanger] = useState(0)
+  useEffect(()=>{
+
+    setValue(changer)
+  },[changer])
+  useEffect(()=>{
+
+    setValue(revertValue)
+  },[revertValue])
+
+  const [incorrectValue, setIncorrect] = useState(false)
+  useEffect(()=>{
+    if(props.type === "to"){
+      console.log("props.incorrectBalanceToValue",props.incorrectBalanceToValue)
+      setIncorrect(props.incorrectBalanceToValue)
+
+    }else{
+      console.log("props.incorrectBalance",props.incorrectBalance)
+      setIncorrect(props.incorrectBalance)
+    }
+  },[props.incorrectBalanceToValue,props.incorrectBalance])
 
   return (
     <>
       <div className="input">
         <div className="input-wrapper">
           <span className="input-title">{props.text}</span>
-          <span className="input-balance">{(walletIsConnected && props.token.symbol) && `Balance: ${props.token.balance > 0 ? parseFloat(props.token.balance.toFixed(4)) : props.token.balance}`}</span>
+          <span className={incorrectValue ? "input-balance incorBalance " : "input-balance"}>{(walletIsConnected && props.token.symbol) && `Balance: ${
+            props.token.balance < 0.0001 ? parseFloat(props.token.balance.toFixed(8)) : parseFloat(props.token.balance.toFixed(4))
+          }
+            `}</span>
         </div>
         <div className="input-wrapper">
           <input
             type="number"
             className={props.value > 0 ? "input-field" : "input-field input-field--zero"}
             value={props.value}
-            onChange={event => setValue(+event.target.value)}
+            onChange={event => setChanger(+event.target.value)}
             onKeyPress={event => handleKeyPress(event)}
             min="0"
             autoFocus={props.autoFocus || false}

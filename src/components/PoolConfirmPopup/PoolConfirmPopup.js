@@ -7,6 +7,8 @@ import { iconGenerator } from '../../iconGenerator';
 import MainBlock from '../MainBlock/MainBlock';
 import CloseBtn from '../CloseBtn/CloseBtn';
 import {setSwapAsyncIsWaiting} from "../../store/actions/swap";
+import {setManageAsyncIsWaiting} from "../../store/actions/manage";
+import {setTransactionsList} from "../../store/actions/wallet";
 
 function PoolConfirmPopup(props) {
   const dispatch = useDispatch();
@@ -19,34 +21,68 @@ function PoolConfirmPopup(props) {
   const fromValue = useSelector(state => state.poolReducer.fromInputValue);
   const toValue = useSelector(state => state.poolReducer.toInputValue);
 
+
+  const transactionsList = useSelector(state => state.walletReducer.transactionsList);
+
   const pairId = useSelector(state => state.poolReducer.pairId);
 
   async function handleSuply() {
+
     dispatch(setPoolAsyncIsWaiting(true));
     props.hideConfirmPopup();
 
       let poolStatus = await processLiquidity(curExt, pairId, fromValue * 1000000000, toValue * 1000000000);
+    console.log("pairId",pairId)
       console.log("poolStatus",poolStatus)
+    if(!poolStatus || (poolStatus && (poolStatus.code === 1000 || poolStatus.code === 3))){
+      dispatch(setPoolAsyncIsWaiting(false))
+    }
 
-     if(poolStatus.code){
-       dispatch(setPoolAsyncIsWaiting(false))
-       switch (poolStatus.text) {
+    let olderLength = transactionsList.length;
+    let newLength = transactionsList.push({
+      type: "processLiquidity",
+      fromValue: fromValue,
+      toValue: toValue,
+      fromSymbol: fromToken.symbol,
+      toSymbol: toToken.symbol,
+      lpTokens: null,
+      LPsymbol:`DS-W${fromToken.symbol}/W${toToken.symbol}`
+    })
+    let item = newLength - 1
+    console.log("itemitem",typeof item,item,"prop",newLength - 1, "menu",newLength.length - olderLength.length)
+    localStorage.setItem("currentElement", item);
+    localStorage.setItem("lastType", "processLiquidity");
+    if (transactionsList.length) await dispatch(setTransactionsList(transactionsList));
 
-         case 'Canceled by user.':
-           dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-           break;
-         case 'Rejected by user':
-           dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
-           break;
-         default:
-           dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
-           break;
 
-       }
+    // if(poolStatus && poolStatus.code){
+    //   dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+    //   dispatch(setPoolAsyncIsWaiting(false))
+    // }
+    // if(!poolStatus.code){
+    //   dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+    // }
+    //  if(poolStatus.code){
+    //    dispatch(setPoolAsyncIsWaiting(false))
+       // switch (poolStatus.text) {
+       //
+       //   case 'Canceled by user.':
+       //     dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+       //     break;
+       //   case 'Rejected by user':
+       //     dispatch(showPopup({type: 'error', message: 'Operation canceled.'}));
+       //     break;
+       //   default:
+       //     dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+       //     break;
+       //
+       // }
+
      }
+
     // dispatch(setPoolAsyncIsWaiting(false))
 
-  }
+
 
   return (
     <div className="popup-wrapper confirm-popup">
@@ -66,7 +102,7 @@ function PoolConfirmPopup(props) {
               <img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol}/>
               <span className="confirm-token">{fromToken.symbol}/{toToken.symbol} Pool Tokens</span>
             </div>
-            <p className="confirm-text">Outpoot is estimated. If the price changes by more than 0.5% your transaction will revert</p>
+            <p className="confirm-text">Output is estimated. If the price changes by more than 0.5% your transaction will revert</p>
             <button className="btn popup-btn" onClick={() => handleSuply()}>Confirm Supply</button>
           </>
         }

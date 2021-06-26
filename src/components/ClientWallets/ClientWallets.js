@@ -17,7 +17,7 @@ function ClientWallets(props) {
     const [filter, setFilter] = useState('');
 
     const wallet = useSelector(state => state.walletReducer.wallet);
-
+    const walletIsConnected = useSelector(state => state.appReducer.walletIsConnected);
     const tokenList = useSelector(state => state.walletReducer.tokenList);
     const LPTokenList = useSelector(state => state.walletReducer.liquidityList);
 console.log("tokenList",tokenList,"LPTokenList",LPTokenList)
@@ -45,6 +45,73 @@ console.log("tokenList",tokenList,"LPTokenList",LPTokenList)
     }
 
     //console.log(LPTokenList);
+useEffect(()=>{
+    if(!walletIsConnected){
+        return
+    }
+    setAT(toArray(tokenList, LPTokenList))
+console.log("--------------------",tokenList,LPTokenList)
+
+},[tokenList,LPTokenList])
+
+useEffect(async ()=>{
+    if(!walletIsConnected){
+        return
+    }
+    let allWallets = await getAllClientWallets(wallet && wallet.id)
+    if(allWallets.length > (tokenList.length + LPTokenList.length)){
+
+
+       // allWallets.forEach(async item => await subscribe(item.walletAddress));
+
+let liquidityListST = allWallets.filter(i => i.symbol.includes('/'));
+
+let tokenListST = allWallets.filter(i => !i.symbol.includes('/')).map(i => (
+    {
+        ...i,
+        symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
+    })
+);
+
+    //localStorage.setItem('tokenList', JSON.stringify(tokenListST));
+    //localStorage.setItem('liquidityList', JSON.stringify(liquidityListST));
+
+    dispatch(setTokenList(tokenListST));
+    dispatch(setLiquidityList(liquidityListST));
+    return
+    // setAT(toArray(tokenListST, liquidityListST))
+}
+
+    let changeba = allWallets && allWallets.filter(item=>{
+        let curBD = at.filter(item2=>item2.walletAddress === item.walletAddress)
+        console.log("curItem1",item, "curBD",curBD)
+        //TODO CHECK console.log curDB
+        if(!curBD.length) return
+        return curBD[0].balance !== item.balance
+
+    })
+
+    if(changeba.length){
+        // allWallets.forEach(async item => await subscribe(item.walletAddress));
+
+        let liquidityListST = allWallets.filter(i => i.symbol.includes('/'));
+
+        let tokenListST = allWallets.filter(i => !i.symbol.includes('/')).map(i => (
+            {
+                ...i,
+                symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
+            })
+        );
+
+        localStorage.setItem('tokenList', JSON.stringify(tokenListST));
+        localStorage.setItem('liquidityList', JSON.stringify(liquidityListST));
+        dispatch(setTokenList(tokenListST));
+        dispatch(setLiquidityList(liquidityListST));
+        // setAT(toArray(tokenListST, liquidityListST))
+    }
+},[])
+
+
 
 useEffect(async ()=>{
     let allWallets = await getAllClientWallets(wallet && wallet.id)
@@ -95,7 +162,7 @@ if(allWallets.length > (tokenList.length + LPTokenList.length)){
                                             walletAddress={item.walletAddress}
                                             symbol={item.symbol}
                                             balance={item.balance}
-                                            lp={item.lp}
+                                            lp={item.lp || false}
                                             key={item.symbol}
                                         />
                                     ))

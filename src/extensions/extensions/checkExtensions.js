@@ -21,8 +21,7 @@ export async function checkExtensions() {
     ]
 }
 
-function checkExtensionAvailability() {
-
+async function checkExtensionAvailability() {
     return window.freeton !== undefined;
 }
 
@@ -99,7 +98,9 @@ async function broxus() {
         return await contract.methods[methodName](params).call({cachedState: undefined})
     };
     curExtenson.callMethod = async (methodName, params, contract) => {
-        return await contract.methods[methodName](params).sendExternal({publicKey: accountInteraction.publicKey}).catch(e=>console.log(e))
+        return await contract.methods[methodName](params).sendExternal({publicKey: accountInteraction.publicKey}).catch(e=> {
+            return e
+        })
     };
     curExtenson.internal = async (methodName, params, contract) => {
         return await contract.methods[methodName](params).send({

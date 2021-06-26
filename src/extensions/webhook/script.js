@@ -1,4 +1,16 @@
+import {DEXrootContract} from "../contracts/DEXRoot.js";
+import {DEXclientContract} from "../contracts/DEXClient.js";
+import {GContract} from "../contracts/GContract.js";
+import {TONTokenWalletContract} from "../contracts/TONTokenWallet.js";
+import {RootTokenContract} from "../contracts/RootTokenContract.js";
+import {SafeMultisigWallet} from "../msig/SafeMultisigWallet.js";
+import {DEXPairContract} from "../contracts/DEXPairContract.js";
+import {abiContract, signerKeys} from "@tonclient/core";
+// import {getWalletBalance} from "../sdk/run";
 import {libWeb} from "@tonclient/lib-web";
+import {store} from '../../index'
+import {setSubscribeData} from '../../store/actions/wallet'
+
 const { ResponseType } = require("@tonclient/core/dist/bin");
 const {
     MessageBodyType,
@@ -10,19 +22,6 @@ const DappServer = "net.ton.dev"
 const client = new TonClient({ network: { endpoints: [DappServer] } });
 
 const Radiance = require('../Radiance.json');
-import {DEXrootContract} from "../contracts/DEXRoot.js";
-import {DEXclientContract} from "../contracts/DEXClient.js";
-import {GContract} from "../contracts/GContract.js";
-import {TONTokenWalletContract} from "../contracts/TONTokenWallet.js";
-import {RootTokenContract} from "../contracts/RootTokenContract.js";
-import {SafeMultisigWallet} from "../msig/SafeMultisigWallet.js";
-import {DEXPairContract} from "../contracts/DEXPairContract.js";
-import {abiContract, signerKeys, signerSigningBox} from "@tonclient/core";
-// import {getWalletBalance} from "../sdk/run";
-import {checkExtensions, getCurrentExtension} from "../extensions/checkExtensions";
-
-import {store} from '../../index'
-import {setSubscribeData} from '../../store/actions/wallet'
 
 function hex2a(hex) {
     let str = '';
@@ -36,7 +35,18 @@ function getShardThis(string) {
     return string[2];
 }
 
+let GiverAd = "0:ed069a52b79f0bc21d13da9762a591e957ade1890d4a1c355e0010a8cb291ae4"
+export async function transferFromGiver(addr, count) {
+    const gSigner = signerKeys({
+        "public": "d7e584a9ef4d41de1060b95dc1cdfec6df60dd166abc684ae505a9ff48925a19",
+        "secret": "742bba3dab8eb0622ba0356acd3de4fd263b9f7290fdb719589f163f6468b699"
+    })
 
+    const curGiverContract = new Account(GContract, {address: GiverAd, signer: gSigner,client});
+    return await curGiverContract.run("pay", {
+        addr, count
+    });
+}
 
 export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAddress) {
     let connectorSoArg0;
@@ -52,6 +62,7 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
     let walletAddr
     while (!status) {
         let response = await accClient.runLocal("getConnectorAddress", {_answer_id: 0, connectorSoArg: n})
+        console.log("response",response)
         connectorAddr = response.decoded.output.value0;
         shardC = getShardThis(connectorAddr);
         if (shardC === targetShard) {
@@ -79,8 +90,8 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
 export async function getRootCreators() {
     // try {
     const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
-        let RootCreators = await RootContract.runLocal("creators", {})
-        return RootCreators.decoded.output
+    let RootCreators = await RootContract.runLocal("creators", {})
+    return RootCreators.decoded.output
     // } catch (e) {
     //     console.log("catch E", e);
     //     return e
@@ -91,6 +102,7 @@ export async function getRootBalanceOF() {
         const RootContract = new Account(DEXrootContract, {address:Radiance.networks['2'].dexroot, client});
 
         let RootbalanceOf = await RootContract.runLocal("balanceOf", {})
+
         return RootbalanceOf.decoded.output
     } catch (e) {
         console.log("catch E", e);
@@ -248,7 +260,7 @@ export async function getAllPairsWoithoutProvider() {
  */
 
 export async function getClientBalance(clientAddress) {
-
+console.log("clientAddress",clientAddress)
     let address = clientAddress
     if(clientAddress === "0:0000000000000000000000000000000000000000000000000000000000000000")return 0
     try {
@@ -261,7 +273,7 @@ export async function getClientBalance(clientAddress) {
             },
             result: "balance",
         });
-
+        console.log("clientBalance",clientBalance)
         return +clientBalance.result[0].balance / 1000000000
     } catch (e) {
         console.log("catch E", e);
@@ -322,7 +334,27 @@ export async function subscribe(address) {
             if (decoded === 304) {decoded = await decode.message(SafeMultisigWallet.abi, params.result.boc)}
             if (decoded === 304) {decoded = await decode.message(DEXPairContract.abi, params.result.boc)}
             if (decoded === 304) {decoded = await decode.message(DEXclientContract.abi, params.result.boc)}
-            if(decoded.value.grams){
+
+            if(params.result.src === GiverAd){
+                console.log("from giver",params)
+                return
+            }
+            if(decoded.name === "burnByOwner") {
+                let caseID3 = await checkMessagesAmount({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
+                setTimeout(()=>store.dispatch(setSubscribeData(caseID3)),5000)
+                return
+            }
+
+
+            if(decoded.name === "accept"){
+                console.log("decoded.name",{transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
+                let caseID2 = await checkMessagesAmount({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
+                setTimeout(()=>store.dispatch(setSubscribeData(caseID2)),10000)
+                return
+            }
+console.log("decoded",decoded,"params",params)
+
+            if(decoded.value && decoded.value.grams){
                 return null
             }
             let caseID = await checkMessagesAmount({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
@@ -353,7 +385,44 @@ export async function getPairsTotalSupply(pairAddress) {
         return e
     }
 }
-
+export async function pairs(clientAddress) {
+    const acc = new Account(DEXclientContract, {address: clientAddress, client});
+    try{
+        const response = await acc.runLocal("pairs", {});
+        let pairsC = response.decoded.output.pairs;
+        console.log("pairs",pairsC)
+        return pairsC
+    } catch (e) {
+        console.log("catch E", e);
+        return e
+    }
+}
+export async function getsoUINT(clientAddress) {
+    console.log("clientAddress",clientAddress)
+    const acc = new Account(DEXclientContract, {address: clientAddress, client});
+    try{
+        console.log("sstrt")
+        const response = await acc.runLocal("soUINT", {});
+        console.log("response",response)
+        let soUINTC = response.decoded.output.soUINT;
+        console.log("soUINTC",soUINTC)
+        return soUINTC
+    } catch (e) {
+        console.log("catch E", e);
+        return e
+    }
+}
+export async function getAllDataPrep(clientAddress) {
+    const acc = new Account(DEXclientContract, {address: clientAddress, client});
+    try{
+        const response = await acc.runLocal("getAllDataPreparation", {});
+        console.log("response get all data",response)
+        return response.decoded.output;
+    } catch (e) {
+        console.log("catch E", e);
+        return e
+    }
+}
 
 
 export async function getAllDataPreparation(clientAddress) {
@@ -367,12 +436,11 @@ export async function getAllDataPreparation(clientAddress) {
     }
 }
 
-
 const secretKeys = {
-"0:8ed631b2691e55ddc65065e0475d82a0b776307797b31a2683a3af7b5c26b984": {"public":"0ce403a4a20165155788f0517d1a455b4f1e82899f3782fadcf07413b2a56730","secret":"e91e2e4e61d35d882a478bb21f77184b9aca6f93faedf6ed24be9e9bf032ef55"},
-"0:d214d4779f63e062569a39d414a98c9891cf5e97cc790a3e6c62ce5fd0a5e1c9": {"public":"cdc97359b239a115d61364526052da837a85d396fa7cca76da015942657c9fad","secret":"f5a05c6211db62ff076fb25a7c349033123f2a0b9aea97b673f2b83e378b3824"},
-"0:32354f00d4f7c6adea7da52e9300a5aa0321523a85c8e759ccea947578ace4c3": {"public":"04a88959a0b1b1655894343714ce7bc7c516c8195407ab6c8de8b64c92e7f172","secret":"cd69d372dacd5f8fd0f8e6db120205bb128507df76b02064f6d01d90e8e3be04"},
-"0:c58d18098ddc6a469308e41555699384f5f2dc83ff3d55cb61a3bdabcb9d3b01": {"public":"f574ac4095a3d3d8b267e4300bac4825ece723ed2569238a860149b683201a5c","secret":"96975ca89e99116a97a4850f0cc962e8d2630a80e4568d76b8e2f94a7addf312"}
+    "0:8ed631b2691e55ddc65065e0475d82a0b776307797b31a2683a3af7b5c26b984": {"public":"0ce403a4a20165155788f0517d1a455b4f1e82899f3782fadcf07413b2a56730","secret":"e91e2e4e61d35d882a478bb21f77184b9aca6f93faedf6ed24be9e9bf032ef55"},
+    "0:d214d4779f63e062569a39d414a98c9891cf5e97cc790a3e6c62ce5fd0a5e1c9": {"public":"cdc97359b239a115d61364526052da837a85d396fa7cca76da015942657c9fad","secret":"f5a05c6211db62ff076fb25a7c349033123f2a0b9aea97b673f2b83e378b3824"},
+    "0:0fa9e2a9993f55f41c90b050468f2f7909a391b7de3cb1b3df74bf449b4dae4c": {"public":"f574ac4095a3d3d8b267e4300bac4825ece723ed2569238a860149b683201a5c","secret":"96975ca89e99116a97a4850f0cc962e8d2630a80e4568d76b8e2f94a7addf312"},
+    "0:d1828255dc48d7db45e9e36c6ef5852319ecb6376bf95bf4e7c1a77d9f3590e0": {"public":"04a88959a0b1b1655894343714ce7bc7c516c8195407ab6c8de8b64c92e7f172","secret":"cd69d372dacd5f8fd0f8e6db120205bb128507df76b02064f6d01d90e8e3be04"}
 };
 
 export async function mintTokens(walletAddress, clientAddress) {
@@ -385,20 +453,18 @@ export async function mintTokens(walletAddress, clientAddress) {
             if(wallet === walletAddress) rootAddress = walletId;
         }
     }
+    console.log("rootData",rootData)
     const signer = signerKeys(secretKeys[rootAddress]);
-    const gSigner = signerKeys({
-        "public": "d7e584a9ef4d41de1060b95dc1cdfec6df60dd166abc684ae505a9ff48925a19",
-        "secret": "742bba3dab8eb0622ba0356acd3de4fd263b9f7290fdb719589f163f6468b699"
-    })
+
     const curRootContract = new Account(RootTokenContract, {address: rootAddress, signer, client});
-    const curGiverContract = new Account(GContract, {address: "0:2225d70ebde618b9c1e3650e603d6748ee6495854e7512dfc9c287349b4dc988", signer: gSigner,client});
     let usersGiver = []
     if(localStorage.getItem("usersGiver") === null) {
         localStorage.setItem("usersGiver", JSON.stringify(usersGiver))
     }
     else usersGiver = JSON.parse(localStorage.getItem("usersGiver"));
+    console.log("rootData[rootAddress]",rootData[rootAddress])
     if(usersGiver.includes(rootData[rootAddress]) === false) {
-        let res = await curGiverContract.run("pay", {addr: rootData[rootAddress]});
+        await transferFromGiver(rootData[rootAddress], 120000000)
         usersGiver.push(rootData[rootAddress])
     }
     localStorage.setItem("usersGiver", JSON.stringify(usersGiver))
@@ -407,7 +473,9 @@ export async function mintTokens(walletAddress, clientAddress) {
         tokens: countToken*1e9,
         to: rootData[rootAddress]
     }).catch(e => {
+        console.log("token giver error", e)
             return e
         }
     )
+    console.log("resf",resf)
 }

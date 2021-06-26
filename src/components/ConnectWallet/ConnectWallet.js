@@ -1,11 +1,18 @@
 import React, {useEffect} from 'react';
 import {useSelector, useDispatch} from 'react-redux';
 import {useHistory} from 'react-router-dom';
-import {closeConnecting, setWalletIsConnected, showPopup} from '../../store/actions/app';
-import {setLiquidityList, setPubKey, setTokenList, setWallet} from '../../store/actions/wallet';
+import {closeConnecting, setCurExt, setWalletIsConnected, showPopup} from '../../store/actions/app';
+import {setLiquidityList, setPairsList, setPubKey, setTokenList, setWallet} from '../../store/actions/wallet';
 import { setSwapFromToken, setSwapToToken } from '../../store/actions/swap';
 import { setPoolFromToken, setPoolToToken } from '../../store/actions/pool';
-import { getAllClientWallets, getClientBalance, checkPubKey, subscribe } from '../../extensions/webhook/script.js';
+import {
+    getAllClientWallets,
+    getClientBalance,
+    checkPubKey,
+    subscribe,
+    getRootBalanceOF,
+    getAllPairsWoithoutProvider, checkClientPairExists
+} from '../../extensions/webhook/script.js';
 import { setCreator,transfer } from '../../extensions/sdk/run';
 import MainBlock from '../MainBlock/MainBlock';
 import CloseBtn from '../CloseBtn/CloseBtn';
@@ -25,20 +32,46 @@ function ConnectWallet() {
 
     useEffect(async () => {
         let pubKey = await checkPubKey(curExt._extLib.pubkey);
+        let msigAd = curExt._extLib.address;
         if(!pubKey.status) {
-            try {
-                let tranferToDex = await transfer(curExt._extLib.SendTransfer,Radiance.networks['2'].dexroot,10000000000)
+            let balanceOF = await getRootBalanceOF()
+            if(!balanceOF.balanceOf[msigAd]) {
+                let tranferToDex = await transfer(curExt._extLib.SendTransfer, Radiance.networks['2'].dexroot, 10000000000)
+                if (tranferToDex && tranferToDex.code) {
+                    dispatch(closeConnecting());
+                    dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+                    dispatch(setCurExt(""));
+                    return
+                }
+            }
                 let dexCLientStatus = await setCreator(curExt);
-            } catch (err) {
-                console.log(err);
+            console.log("dexCLientStatus",dexCLientStatus)
+            if((dexCLientStatus && dexCLientStatus.code) || !dexCLientStatus.status){
                 dispatch(closeConnecting());
                 dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));
+                dispatch(setCurExt(""));
+                return
             }
+
+
+
         }
+
+        console.log("i am here")
         pubKey = await checkPubKey(curExt._extLib.pubkey);
         try {
             let msgiAddress = curExt._extLib.address;
             let msigBalance = await getClientBalance(msgiAddress);
+
+            const pairs = await getAllPairsWoithoutProvider();
+
+            let arrPairs = [];
+            await pairs.map(async item=>{
+                item.exists = await checkClientPairExists(pubKey.dexclient, item.pairAddress)
+                arrPairs.push(item)
+            })
+            dispatch(setPairsList(arrPairs));
+
 
             let tokenList = await getAllClientWallets(pubKey.dexclient);
             let liquidityList = [];
@@ -57,8 +90,8 @@ function ConnectWallet() {
 
                 dispatch(setTokenList(tokenList));
                 dispatch(setLiquidityList(liquidityList));
-                localStorage.setItem('tokenList', JSON.stringify(tokenList));
-                localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
+                //localStorage.setItem('tokenList', JSON.stringify(tokenList));
+                //localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
             }
             const clientBalance = await getClientBalance(pubKey.dexclient);
             dispatch(setPubKey(pubKey));

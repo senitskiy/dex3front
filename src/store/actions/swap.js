@@ -1,4 +1,5 @@
 import {
+  SET_SWAP_FROM_INPUT_VALUE_CHANGE,
   SET_SWAP_FROM_INPUT_VALUE,
   SET_SWAP_TO_INPUT_VALUE,
   SET_SWAP_FROM_TOKEN,
@@ -14,6 +15,9 @@ import {
 
 export function setSwapFromInputValue(payload) {
   return { type: SET_SWAP_FROM_INPUT_VALUE, payload }
+}
+export function setSwapFromInputValueChange(payload) {
+  return { type: SET_SWAP_FROM_INPUT_VALUE_CHANGE, payload }
 }
 
 export function setSwapToInputValue(payload) {

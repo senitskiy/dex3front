@@ -28,7 +28,7 @@
 		"react-transition-group": "^4.4.1",
 		"redux": "^4.1.0",
 		"redux-devtools-extension": "^2.13.9",
-		"ton-inpage-provider": "^0.0.43"
+		"ton-inpage-provider": "^0.1.17"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.13.16",
