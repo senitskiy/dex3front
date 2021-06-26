@@ -59,6 +59,7 @@ useEffect(async ()=>{
         return
     }
     let allWallets = await getAllClientWallets(wallet && wallet.id)
+    if(allWallets.length === (tokenList.length + LPTokenList.length)) return;
     if(allWallets.length > (tokenList.length + LPTokenList.length)){
 
 
@@ -76,6 +77,13 @@ let tokenListST = allWallets.filter(i => !i.symbol.includes('/')).map(i => (
     //localStorage.setItem('tokenList', JSON.stringify(tokenListST));
     //localStorage.setItem('liquidityList', JSON.stringify(liquidityListST));
 
+    tokenListST.map((i) => {
+        i.lp = false;
+    })
+    liquidityListST.map((i) => {
+       i.lp = true;
+    })
+        setAT([...tokenListST, ...liquidityListST])
     dispatch(setTokenList(tokenListST));
     dispatch(setLiquidityList(liquidityListST));
     return

@@ -158,8 +158,8 @@ const [onloading,setonloading] = useState(false)
 
   useEffect(async () => {
       // setonloading(true)
-    if(subscribeData && subscribeData.dst) {
-      const pubKey2 = await checkPubKey(curExt._extLib.pubkey)
+    if(subscribeData.dst) {
+        const pubKey2 = await checkPubKey(curExt._extLib.pubkey)
       const clientBalance = await getClientBalance(pubKey2.dexclient);
 console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey2.dexclient)
       let item = localStorage.getItem("currentElement");
@@ -188,7 +188,6 @@ console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey2.d
       console.log("tokenList after WEBH",tokenList)
       let liquidityList = [];
       console.log(9999395394583590, tokenList)
-
       if(tokenList.length) {
         tokenList.forEach(async item => await subscribe(item.walletAddress));
 
