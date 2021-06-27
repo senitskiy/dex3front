@@ -8,8 +8,13 @@ import MainBlock from "../MainBlock/MainBlock";
 import SearchInput from '../SearchInput/SearchInput';
 import Item from '../Item/Item';
 import './ClientWallets.scss';
-import {getAllClientWallets, subscribe} from "../../extensions/webhook/script";
-import {setLiquidityList, setTokenList} from "../../store/actions/wallet";
+import {
+    checkClientPairExists,
+    checkwalletExists,
+    getAllClientWallets, getAllPairsWoithoutProvider,
+    subscribe
+} from "../../extensions/webhook/script";
+import {setLiquidityList, setPairsList, setTokenList} from "../../store/actions/wallet";
 
 function ClientWallets(props) {
 
@@ -117,6 +122,7 @@ let tokenListST = allWallets.filter(i => !i.symbol.includes('/')).map(i => (
         dispatch(setLiquidityList(liquidityListST));
         // setAT(toArray(tokenListST, liquidityListST))
     }
+
 },[])
 
 
@@ -153,12 +159,16 @@ if(allWallets.length > (tokenList.length + LPTokenList.length)){
 
     return ReactDOM.createPortal(
         <div className="select-wrapper">
+
             <MainBlock
                 title={'User wallets'}
 
+
                 button={<CloseBtn func={handleClose}/>}
                 content={
-                    !tokenList.length && !LPTokenList.length ?  <p className="wallet-ballance">You have no wallets yet. </p> :
+
+                    !tokenList.length && !LPTokenList.length ?  <div><p className="wallet-ballance" style={{"margin":"0","marginBottom":"10px"}}>You don't have any wallets for your assets.</p>
+                            <p className="wallet-ballance" style={{"margin":"0","marginBottom":"10px"}}>Please go to "Swap", choose a pair of assets and connect to a pair and come back — we'll create some wallets for you here.</p></div> :
                         (<>
                             <SearchInput func={setFilter.bind(this)}/>
                             <div className="select-list">
