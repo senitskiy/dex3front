@@ -185,7 +185,16 @@ console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey2.d
 
 
 
-
+        // const pairs = await getAllPairsWoithoutProvider();
+        // let arrPairs = [];
+        // await pairs.map(async item=>{
+        //     item.exists = await checkClientPairExists(pubKey.address, item.pairAddress)
+        //     item.walletExists = await checkwalletExists(pubKey.address, item.pairAddress)
+        //
+        //     arrPairs.push(item)
+        // })
+        // console.log("pairspairspairs",pairs)
+        // dispatch(setPairsList(arrPairs));
 
       let tokenList = await getAllClientWallets(pubKey.address);
       console.log("tokenList after WEBH",tokenList)

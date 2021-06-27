@@ -50,6 +50,7 @@ if(!pairsList || !pairId){
   console.log("pairsList CKECK 0",pairsList)
   return
 }
+      if(!curePairData || !curePairData[0])return
    let curePairData = pairsList.filter(item=>item.pairAddress===pairId)
     setExistsPair(curePairData[0].exists)
       setCurrentPair(curePairData)
@@ -67,6 +68,7 @@ if(!pairsList || !pairId){
             console.log("pairsList CKECK 0",pairsList)
             return
         }
+        if(!curePairData || !curePairData[0])return
         let curePairData = pairsList.filter(item=>item.pairAddress===pairId)
         setExistsPair(curePairData[0].exists)
         setCurrentPair(curePairData)
@@ -237,7 +239,7 @@ if(!pairsList || !pairId){
         )}
 
         { swapConfirmPopupIsVisible && <SwapConfirmPopup hideConfirmPopup={setSwapConfirmPopupIsVisible.bind(this, false)} /> }
-        { connectAsyncIsWaiting && <WaitingPopupConnect text={`Connecting to ${curPia[0].symbolA}/${curPia[0].symbolB} pair`} /> }
+        { connectAsyncIsWaiting && <WaitingPopupConnect text={`Connecting to ${fromToken.symbol}/${toToken.symbol} pair`} /> }
         { swapAsyncIsWaiting && <WaitingPopup text={`Swapping ${fromValue} ${fromToken.symbol} for ${toValue} ${toToken.symbol}`} /> }
 
     </div>
