@@ -71,8 +71,14 @@ const [onloading,setonloading] = useState(false)
           setonloading(false)
           return
       }
+
+      let extFromLocalisAVail = extensionsListBothNotAvaile.filter(item=>item.name===localStorage.getItem('extName'))
+      let extFromLocalisAVail2 = extensionsListBothNotAvaile.filter(item=>item.name!==localStorage.getItem('extName'))
+      console.log("extFromLocalisAVail",extFromLocalisAVail)
+
+
 // console.log((localStorage.getItem('extName') === null || !localStorage.getItem('extName').length))
-    const curExtname = (localStorage.getItem('extName') === null || !localStorage.getItem('extName').length) ? extensionsListBothNotAvaile[0].name : localStorage.getItem('extName');
+    const curExtname = (localStorage.getItem('extName') === null || !localStorage.getItem('extName').length) ? extensionsListBothNotAvaile[0].name : (extFromLocalisAVail.length ? localStorage.getItem('extName') : extFromLocalisAVail2[0].length);
     let curExtt = await getCurrentExtension(curExtname)
     const pubKey2 = await checkPubKey(curExtt._extLib.pubkey)
 
