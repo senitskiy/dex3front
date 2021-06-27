@@ -43,7 +43,7 @@ function Swap () {
     const [connectAsyncIsWaiting, setconnectAsyncIsWaiting] = useState(false);
   const [curExist, setExistsPair] = useState(false);
     const [curPia, setCurrentPair] = useState([]);
-    const [readable, setreadable] = useState(false);
+    const [notDeployedWallets, setNotDeployedWallets] = useState([]);
 
   useEffect(()=>{
     if(!pairsList || !pairId){
@@ -52,10 +52,52 @@ function Swap () {
     }
    let curePairData = pairsList.filter(item=>item.pairAddress===pairId)
     setExistsPair(curePairData[0].exists)
-    setCurrentPair(curePairData)
-    console.log("curePairData",curePairData,"curePairData[0].exists")
+      setCurrentPair(curePairData)
+
+    //  if(!curePairData || !curePairData[0])return
+    //  let walExists = curePairData[0].walletExists.filter(item=>item.status===false)
+    // setNotDeployedWallets(walExists)
+
+    // console.log("walExists",walExists)
 
   },[pairsList, pairId])
+
+    useEffect(()=>{
+        if(!pairsList || !pairId){
+            console.log("pairsList CKECK 0",pairsList)
+            return
+        }
+        let curePairData = pairsList.filter(item=>item.pairAddress===pairId)
+        setExistsPair(curePairData[0].exists)
+        setCurrentPair(curePairData)
+
+        //  if(!curePairData || !curePairData[0])return
+        //  let walExists = curePairData[0].walletExists.filter(item=>item.status===false)
+        // setNotDeployedWallets(walExists)
+
+        // console.log("walExists",walExists)
+
+    },[pairsList, pairId])
+
+
+    useEffect(()=>{
+        if(!pairsList || !pairId){
+            console.log("pairsList CKECK 0",pairsList)
+            return
+        }
+        let curePairData = pairsList.filter(item=>item.pairAddress===pairId)
+        console.log("curePairData",curePairData)
+
+        if(!curePairData || !curePairData[0])return
+        if(curePairData[0].walletExists) {
+            let walExists = curePairData[0].walletExists.filter(item => item.status === false)
+            setNotDeployedWallets(walExists)
+        }
+
+
+    },[toToken])
+
+
 
   const rate = useSelector(state => state.swapReducer.rate);
 
@@ -84,61 +126,65 @@ function Swap () {
   async function handleConnectPair() {
       console.log("22",curExist)
 
-
+      console.log("notDeployedWallets",notDeployedWallets)
 
     setconnectAsyncIsWaiting(true);
-        let connectRes = await connectToPair(curExt, pairId);
+        let connectRes = await connectToPair(curExt, pairId, curPia);
 
 
-      if(!connectRes || (connectRes && (connectRes.code === 1000))){
+      if(!connectRes || (connectRes && (connectRes.code === 1000 || connectRes.code === 3))){
           console.log("connectRes",connectRes)
           setconnectAsyncIsWaiting(false);
-          return
-      }
-        let tokenList = await getAllClientWallets(pubKey.address);
-        let countT = tokenList.length
-        let y = 0
-        while(tokenList.length < countT){
 
-          tokenList = await getAllClientWallets(pubKey.address);
-          y++
-          if(y>500){
-            dispatch(showPopup({type: 'error', message: 'Oops, too much time for deploying. Please connect your wallet again.'}));
+      }else {
+          let tokenList = await getAllClientWallets(pubKey.address);
+          let countT = tokenList.length
+          let y = 0
+          while (tokenList.length < countT) {
+
+              tokenList = await getAllClientWallets(pubKey.address);
+              y++
+              if (y > 500) {
+                  dispatch(showPopup({
+                      type: 'error',
+                      message: 'Oops, too much time for deploying. Please connect your wallet again.'
+                  }));
+              }
           }
-        }
 
-        dispatch(setTokenList(tokenList));
-
-
-        let liquidityList = [];
-
-        if(tokenList.length) {
-          tokenList.forEach(async item => await subscribe(item.walletAddress));
-
-          liquidityList = tokenList.filter(i => i.symbol.includes('/'));
-
-          tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
-              {
-                ...i,
-                symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
-              })
-          );
-          //localStorage.setItem('tokenList', JSON.stringify(tokenList));
-          //localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
           dispatch(setTokenList(tokenList));
-          dispatch(setLiquidityList(liquidityList));
-        }
-      setconnectAsyncIsWaiting(false);
-      setExistsPair(true)
+
+
+          let liquidityList = [];
+
+          if (tokenList.length) {
+              tokenList.forEach(async item => await subscribe(item.walletAddress));
+
+              liquidityList = tokenList.filter(i => i.symbol.includes('/'));
+
+              tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
+                  {
+                      ...i,
+                      symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
+                  })
+              );
+              //localStorage.setItem('tokenList', JSON.stringify(tokenList));
+              //localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
+              dispatch(setTokenList(tokenList));
+              dispatch(setLiquidityList(liquidityList));
+          }
+          setconnectAsyncIsWaiting(false);
+          // setExistsPair(true)
+      }
   }
 
   function getCurBtn(){
       console.log("22",curPia)
-          if(curExist && fromToken.symbol && toToken.symbol){
+          if(curExist && fromToken.symbol && toToken.symbol && !notDeployedWallets.length){
               console.log(1,curExist)
 
           return <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button>
-      }else if(!curExist && fromToken.symbol && toToken.symbol){
+      }else if((!curExist || notDeployedWallets.length) && fromToken.symbol && toToken.symbol){
               console.log(2)
 
               return <button className={(fromToken.symbol && toToken.symbol) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConnectPair()}>Connect pair</button>
@@ -148,24 +194,6 @@ function Swap () {
               return <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button>
 
   }
-
-
-  // function getAmountOut(amountIn) {
-  //   if(!amountIn){
-  //     return 0
-  //   }
-  //   let reserves = pairsList.filter(item=>item.pairAddress === pairId)
-  //   console.log("reserves",reserves)
-  //   let rootIn = reserves[0].reserveA
-  //   let rootOut = reserves[0].reservetB
-  //   console.log("rootIn",rootIn,"amountIn",amountIn,"rootOut",rootOut)
-  //   let amountInWithFee = amountIn * 997;
-  //   let numerator = amountInWithFee * rootOut;
-  //   let denominator = amountInWithFee + rootIn * 1000;
-  //   return (numerator/denominator).toFixed(4);
-  //   // return 1;
-  // }
-
 
   return (
     <div className="container">

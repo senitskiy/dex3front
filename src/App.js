@@ -3,7 +3,7 @@ import {useSelector, useDispatch} from 'react-redux';
 import {Switch, Route, Redirect, useLocation, useHistory} from 'react-router-dom';
 import {changeTheme, setCurExt, setExtensionsList, setWalletIsConnected, showPopup} from './store/actions/app';
 import {setLiquidityList, setPairsList, setPubKey, setSubscribeData, setTokenList, setTransactionsList, setWallet} from './store/actions/wallet';
-import { getAllClientWallets, getAllPairsWoithoutProvider, getClientBalance,checkPubKey, subscribe,checkClientPairExists } from './extensions/webhook/script';
+import { getAllClientWallets, getAllPairsWoithoutProvider, getClientBalance,checkPubKey, subscribe,checkClientPairExists,checkwalletExists } from './extensions/webhook/script';
 import { checkExtensions, getCurrentExtension } from './extensions/extensions/checkExtensions';
 import {
     setSwapAsyncIsWaiting,
@@ -107,8 +107,11 @@ const [onloading,setonloading] = useState(false)
     let arrPairs = [];
     await pairs.map(async item=>{
       item.exists = await checkClientPairExists(pubKey2.dexclient, item.pairAddress)
+      item.walletExists = await checkwalletExists(pubKey2.dexclient, item.pairAddress)
+
       arrPairs.push(item)
     })
+      console.log("pairspairspairs",pairs)
     dispatch(setPairsList(arrPairs));
 
 
@@ -141,8 +144,8 @@ const [onloading,setonloading] = useState(false)
       dispatch(setLiquidityList(liquidityList));
     }
 //TODO
-    const transactionsList = localStorage.getItem('transactionsList') === null ? [] : JSON.parse(localStorage.getItem('transactionsList'));
-    if(transactionsList.length) dispatch(setTransactionsList(transactionsList));
+//     const transactionsList = localStorage.getItem('transactionsList') === null ? {} : JSON.parse(localStorage.getItem('transactionsList'));
+//     if(transactionsList.length) dispatch(setTransactionsList(transactionsList));
 
       setonloading(false)
       console.log("setonloading",onloading)

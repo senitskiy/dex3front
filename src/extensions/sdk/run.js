@@ -289,14 +289,14 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
  * @return   {object} processLiquidity
  */
 
-export async function connectToPair(curExt,pairAddr) {
+export async function connectToPair(curExt,pairAddr,curPia) {
     // console.log("pairAddr",pairAddr,"curExt",curExt)
     const {contract,callMethod,runMethod,pubkey,SendTransfer} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
-
+console.log("curPia",curPia)
     // transferFromGiver(getClientAddressFromRoot.dexclient, 4500000000).then(res=>console.log("secess transfered from giver",res))
 
     // let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
@@ -307,6 +307,11 @@ export async function connectToPair(curExt,pairAddr) {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
         let connectRes= await callMethod("connectPair", {pairAddr: pairAddr}, clientContract)
         console.log("connectRes",connectRes)
+        if(!connectRes || (connectRes && (connectRes.code === 1000 || connectRes.code === 3))){
+
+            return connectRes
+        }
+
         return await getClientForConnect({
             pairAddr: pairAddr,
             runMethod: runMethod,
@@ -334,10 +339,16 @@ export async function getClientForConnect(data) {
         let clientRoots = await getAllDataPrep(clientAddress)
         console.log("soUINT",soUINT,"pairs",pairsT,"clientRoots",clientRoots)
         let curPair = null
+        let n=0
+
         while (!curPair){
             pairsT = await pairs(clientAddress)
             console.log("pairs.pairs[pairAddr]",pairsT[pairAddr])
             curPair = pairsT[pairAddr]
+            n++
+            if(n>500){
+                return {code:3,text:"time limit in checking cur pair"}
+            }
         }
         console.log("cure pair finded")
         return await connectToPairStep2DeployWallets({...soUINT, curPair,clientAdr:clientAddress,callMethod,clientContract,contract:contract,clientRoots:clientRoots.rootKeysR})

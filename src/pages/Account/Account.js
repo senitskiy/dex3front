@@ -40,6 +40,7 @@ function Account() {
     localStorage.removeItem("liquidityList");
     localStorage.setItem('pubKey', JSON.stringify({}));
     localStorage.setItem('wallet', JSON.stringify({}));
+    localStorage.setItem('transactionsList', JSON.stringify({}));
     // dispatch(setTransactionsList([]));
     history.push("/account");
     // history.goBack()

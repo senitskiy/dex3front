@@ -158,7 +158,7 @@ if(allWallets.length > (tokenList.length + LPTokenList.length)){
 
                 button={<CloseBtn func={handleClose}/>}
                 content={
-                    !tokenList.length && !LPTokenList.length ?  <p className="wallet-ballance">You have not wallets yet</p> :
+                    !tokenList.length && !LPTokenList.length ?  <p className="wallet-ballance">You have no wallets yet. </p> :
                         (<>
                             <SearchInput func={setFilter.bind(this)}/>
                             <div className="select-list">
