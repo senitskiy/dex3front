@@ -450,6 +450,19 @@ export async function pairs(clientAddress) {
         return e
     }
 }
+export async function getClientAddrAtRootForShard(pubkey, n) {
+    const acc = new Account(DEXrootContract, {address: Radiance.networks['2'].dexroot, client});
+    try{
+        const response = await acc.runLocal("getClientAddress", {_answer_id:0,clientPubKey:'0x'+pubkey,clientSoArg:n});
+        let value0 = response.decoded.output.value0;
+        console.log("value0",value0)
+        return value0
+    } catch (e) {
+        console.log("catch E", e);
+        return e
+    }
+}
+
 export async function getsoUINT(clientAddress) {
     console.log("clientAddress",clientAddress)
     const acc = new Account(DEXclientContract, {address: clientAddress, client});

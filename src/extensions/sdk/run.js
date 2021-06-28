@@ -12,7 +12,7 @@ import {
     transferFromGiver,
     pairs,
     getsoUINT,
-    getAllDataPrep
+    getAllDataPrep, getClientAddrAtRootForShard
 } from "../webhook/script"
 
 // TonClient.useBinaryLibrary(libWeb);
@@ -41,8 +41,7 @@ export async function setCreator(curExt) {
     let checkClientExists = await checkPubKey(pubkey)
 
     if(checkClientExists.status){
-        console.log(UserException("y already have dex client"))
-        return new UserException("y already have dex client")
+        return {status:false, text:"pubkey checked - y already have dex client"}
     }else {
         try {
 
@@ -50,9 +49,10 @@ export async function setCreator(curExt) {
 
             let checkClientExists = await getRootCreators()
             if(checkClientExists.creators["0x"+pubkey]){
+
                 console.log("checkClientExists.creators[\"0x\"+pubkey]",checkClientExists.creators["0x"+pubkey])
-                await onSharding(curExt)
-                return
+                // await onSharding(curExt)
+                return {status:"success", text:"setCreator success"}
             }
             let setCrStatus = await callMethod("setCreator", {giverAddr: address}, rootContract)
             console.log("setCrStatus",setCrStatus)
@@ -63,10 +63,11 @@ export async function setCreator(curExt) {
                 n++
                 if(n>500){
 
-                    return new UserException("yps, something goes wrong, try again")
+                    return {status:false, text:"setCreator success"}
                 }
             }
-            return await onSharding(curExt)
+            // return await onSharding(curExt)
+            return {status:"success", operation:"setCreator timeout, you tried too much, try again"}
 
 
             // return resp
@@ -85,33 +86,38 @@ export async function setCreator(curExt) {
  * @return   callback         createDEXclient()
  */
 
-export async function onSharding(curExt) {
-    const {name, address, pubkey, contract, runMethod, callMethod} = curExt._extLib
+export async function onSharding(pubkey) {
+    console.log("curExt onSharding",pubkey)
     try {
-        const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
+        // const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
         let targetShard = getShard(Radiance.networks['2'].dexroot);
         // console.log("pubkeypubkey",pubkey)
         let status = false;
         let n = 0;
         let clientAddress
         while (!status) {
-            let response = await runMethod("getClientAddress", {_answer_id:0,clientPubKey:'0x'+pubkey,clientSoArg:n}, rootContract)
+            let response = await getClientAddrAtRootForShard(pubkey,n)
+            // ("getClientAddress", {_answer_id:0,clientPubKey:'0x'+pubkey,clientSoArg:n}, rootContract)
             console.log("response",response)
-            let clientAddr;
-            if(name==="broxus"){
-                // console.log("response.value0",response.value0)
-                clientAddr = response.value0._address;
-            }else{
-                clientAddr = response.value0;
-            }
+            let clientAddr = response;
+            // if(name==="broxus"){
+            //     // console.log("response.value0",response.value0)
+            //     clientAddr = response.value0._address;
+            // }else{
+            //     clientAddr = response.value0;
+            // }
             let shard = getShard(clientAddr);
             if (shard === targetShard) {
                 status = true;
                 clientAddress = clientAddr;
                 // console.log({address: clientAddr, keys: pubkey, clientSoArg: n})
-                return await createDEXclient(curExt, {address: clientAddr, keys: '0x'+pubkey, clientSoArg: n}).catch(e=>{return e})
+                return {status:true, data:{address: clientAddr, keys: '0x'+pubkey, clientSoArg: n}}
+                // return await createDEXclient(curExt, {address: clientAddr, keys: '0x'+pubkey, clientSoArg: n}).catch(e=>{return e})
                 // return {address: clientAddr, keys: pubkey, clientSoArg: n}
-            } else {console.log(n);}
+            }
+            if(n>1000){
+                return {status:false, text:"sharding timeout, you tried too much, try again"}
+            }
             n++;
         }
     } catch (e) {
@@ -128,7 +134,8 @@ export async function onSharding(curExt) {
  */
 
 export async function createDEXclient(curExt, shardData) {
-    const {name, address, pubkey, contract, runMethod, callMethod, internal} = curExt._extLib
+    console.log("shardData",shardData)
+    const {pubkey, contract, callMethod} = curExt._extLib
 
     try {
         const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
@@ -139,7 +146,7 @@ export async function createDEXclient(curExt, shardData) {
                 let ecode = '106';
                 let found = e.text.match(ecode);
                 if(found){
-                    return new UserException("y are not registered at dex root, pls transfer some funds to dex root address")
+                    return {status:false,text:"y are not registered at dex root, pls transfer some funds to dex root address"}
                 }else{
                     return e
                 }
@@ -147,9 +154,14 @@ export async function createDEXclient(curExt, shardData) {
         )
 
         let checkDexClientExists =  await checkPubKey(pubkey);
+        let n=0
         console.log("checkDexClientExists",checkDexClientExists)
         while(!checkDexClientExists.status){
             checkDexClientExists =  await checkPubKey(pubkey);
+            n++
+            if(n>800){
+                return {status:false,text:"checking pubkey failed"}
+            }
         }
         return checkDexClientExists
     } catch (e) {
