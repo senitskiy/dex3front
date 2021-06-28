@@ -33,11 +33,11 @@ export async function getCurrentExtension(extension) {
     //     extensionsArry[0].name = "testing extraton"
     //     return extensionsArry[0]
     // }
-    // if (extension === "extraton") {
+    if (extension === "extraton") {
         curExtension._extLib = await extraton()
-    // } else {
-    //     curExtension._extLib = await broxus()
-    // }
+    } else {
+        curExtension._extLib = await broxus()
+    }
 
     // if (curExtension.length > 1) {
     //     return curExtension[0]
@@ -117,6 +117,22 @@ async function broxus() {
             bounce: false
         })
     }
+
+    // const { transaction } = await ton.rawApi.sendMessage({
+    //     sender: curExtenson.address,
+    //     recipient: new Address(curExtenson.address),
+    //     amount: '10000000000',
+    //     bounce: false,
+    //     payload: {
+    //     //   abi: DePoolAbi,
+    //     //   method: 'addOrdinaryStake',
+    //     //   params: {
+    //     //     stake: '10000000000'
+    //     //   }
+    //     }
+    //   });
+    console.log(curExtenson);
+
     return curExtenson
 }
 
