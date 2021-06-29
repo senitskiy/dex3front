@@ -62,7 +62,7 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
     let walletAddr
     while (!status) {
         let response = await accClient.runLocal("getConnectorAddress", {_answer_id: 0, connectorSoArg: n})
-        console.log("response",response)
+        // console.log("response",response)
         connectorAddr = response.decoded.output.value0;
         shardC = getShardThis(connectorAddr);
         if (shardC === targetShard) {
@@ -367,6 +367,58 @@ async function body(abi, body, internal = true) {
         return e.code
     }
 }
+export async function subscribeClient(address) {
+
+    let subscribeID = (await client.net.subscribe_collection({
+        collection: "messages",
+        filter: {
+            dst: { eq: address },
+        },
+        limit:1,
+        order:[{path:"created_at",direction:'DESC'}],
+        result: "id boc created_at body dst src",
+    }, async (params,responseType) => {
+        console.log("client params ONLY",params)
+        if (responseType === ResponseType.Custom) {
+            let decoded = await decode.message(DEXrootContract.abi, params.result.boc)
+            if (decoded === 304) {decoded = await decode.message(RootTokenContract.abi, params.result.boc)}
+            if (decoded === 304) {decoded = await decode.message(TONTokenWalletContract.abi, params.result.boc)}
+            if (decoded === 304) {decoded = await decode.message(SafeMultisigWallet.abi, params.result.boc)}
+            if (decoded === 304) {decoded = await decode.message(DEXPairContract.abi, params.result.boc)}
+            if (decoded === 304) {decoded = await decode.message(DEXclientContract.abi, params.result.boc)}
+        // "connectCallback"
+        console.log("client params", params, "decoded", decoded)
+        if(decoded.name === "connectCallback") {
+            console.log("client params", params, "decoded", decoded)
+            let caseID3 = await checkMessagesAmountClient({
+                name: decoded.name,
+                src: params.result.src || "default",
+                dst: params.result.dst || "default",
+                created_at: params.result.created_at,
+                walletAddress: decoded.value.wallet || ""
+            })
+            setTimeout(()=>store.dispatch(setSubscribeData(caseID3)),4000)
+        }
+
+
+        }
+    })).handle;
+    console.log("SUBSCRIBED TO client",address)
+    return {status:"success", subscribedAddress: address}
+}
+let checkerArrClient = [];
+let checkMessagesAmountClient = function(messageID){
+    for (let i = 0; i < checkerArrClient.length; i++) {
+        if (checkerArrClient[i].walletAddress === messageID.walletAddress) {
+            return null
+        }
+    }
+    checkerArrClient.push(messageID)
+    return messageID
+}
+
+
+
 
 export async function subscribe(address) {
 
@@ -401,7 +453,7 @@ export async function subscribe(address) {
 
             if(decoded.name === "accept"){
                 console.log("decoded.name",{transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
-                let caseID2 = await checkMessagesAmount({transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
+                let caseID2 = await checkMessagesAmount({name:decoded.name,transactionID:params.result.id, src:params.result.src,dst:params.result.dst,created_at:params.result.created_at, amountOfTokens: decoded.value.tokens})
                 setTimeout(()=>store.dispatch(setSubscribeData(caseID2)),10000)
                 return
             }
@@ -414,6 +466,7 @@ console.log("decoded",decoded,"params",params)
             if(caseID && caseID.dst) store.dispatch(setSubscribeData(caseID));
         }
     })).handle;
+    console.log({status:"success", subscribedAddress: address})
     return {status:"success", subscribedAddress: address}
 }
 let checkerArr = [];
@@ -439,6 +492,7 @@ export async function getPairsTotalSupply(pairAddress) {
     }
 }
 export async function pairs(clientAddress) {
+    console.log("clientAddress -------------",clientAddress)
     const acc = new Account(DEXclientContract, {address: clientAddress, client});
     try{
         const response = await acc.runLocal("pairs", {});

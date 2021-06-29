@@ -11,8 +11,7 @@ import './ClientWallets.scss';
 import {
     checkClientPairExists,
     checkwalletExists,
-    getAllClientWallets, getAllPairsWoithoutProvider,
-    subscribe
+    getAllClientWallets, getAllPairsWoithoutProvider, subscribe,
 } from "../../extensions/webhook/script";
 import {setLiquidityList, setPairsList, setTokenList} from "../../store/actions/wallet";
 
@@ -68,8 +67,7 @@ useEffect(async ()=>{
     if(allWallets.length > (tokenList.length + LPTokenList.length)){
 
 
-       // allWallets.forEach(async item => await subscribe(item.walletAddress));
-
+        allWallets.forEach(async item => await subscribe(item.walletAddress));
 let liquidityListST = allWallets.filter(i => i.symbol.includes('/'));
 
 let tokenListST = allWallets.filter(i => !i.symbol.includes('/')).map(i => (
@@ -91,6 +89,9 @@ let tokenListST = allWallets.filter(i => !i.symbol.includes('/')).map(i => (
         setAT([...tokenListST, ...liquidityListST])
     dispatch(setTokenList(tokenListST));
     dispatch(setLiquidityList(liquidityListST));
+
+
+
     return
     // setAT(toArray(tokenListST, liquidityListST))
 }
@@ -105,7 +106,6 @@ let tokenListST = allWallets.filter(i => !i.symbol.includes('/')).map(i => (
     })
 
     if(changeba.length){
-        // allWallets.forEach(async item => await subscribe(item.walletAddress));
 
         let liquidityListST = allWallets.filter(i => i.symbol.includes('/'));
 
@@ -154,6 +154,7 @@ if(allWallets.length > (tokenList.length + LPTokenList.length)){
 
 },[])
     function handleClose() {
+    console.log("handleClose")
         return dispatch(hideClientWalletsFromSelect())
     }
 
@@ -163,7 +164,7 @@ if(allWallets.length > (tokenList.length + LPTokenList.length)){
             <MainBlock
                 title={'User wallets'}
 
-
+                // handleBlur={handleClose}
                 button={<CloseBtn func={handleClose}/>}
                 content={
 

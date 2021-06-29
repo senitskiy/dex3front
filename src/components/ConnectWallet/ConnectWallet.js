@@ -11,7 +11,7 @@ import {
     checkPubKey,
     subscribe,
     getRootBalanceOF,
-    getAllPairsWoithoutProvider, checkClientPairExists
+    getAllPairsWoithoutProvider, checkClientPairExists, subscribeClient
 } from '../../extensions/webhook/script.js';
 import {setCreator, transfer, onSharding, createDEXclient} from '../../extensions/sdk/run';
 import MainBlock from '../MainBlock/MainBlock';
@@ -157,6 +157,7 @@ function ConnectWallet() {
             })
 
             dispatch(setWalletIsConnected(true));
+            await subscribeClient(pubKey.dexclient)
             dispatch(closeConnecting());
             history.push("/swap")
         } catch (err) {

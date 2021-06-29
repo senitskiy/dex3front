@@ -19,11 +19,11 @@ function ManageConfirmPopup(props) {
   let curPair = pairS.filter(item=>item.pairAddress === pairId)
 
 
-  let poolShare = (balance*100)/(curPair[0].totalSupply/1000000000)
+  let poolShare = (balance*100)/(curPair && curPair[0].totalSupply/1000000000)
   let pooledTokensA = (curPair[0].reserveA/1000000000)*poolShare
   let pooledTokensB = (curPair[0].reservetB/1000000000)*poolShare
   const handleSupplyClick = () => {
-    dispatch(setPoolFromToken(0));
+
     tokenList.forEach(i => {
       if(i.symbol.includes(fromToken.symbol)) {
         dispatch(setPoolFromToken({

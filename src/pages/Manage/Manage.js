@@ -55,7 +55,7 @@ console.log("pair", pairId)
 
 
       console.log("NUMMMM",Number(((balance.toFixed() * rangeValue) / 100) * 1000000000))
-      let returnStatus = await returnLiquidity(curExt, pairId, ((balance.toFixed() * rangeValue) / 100) * 1000000000);
+      let returnStatus = await returnLiquidity(curExt, pairId, ((balance * rangeValue) / 100) * 1000000000);
 
       console.log("returnStatus",returnStatus)
     if(!returnStatus || (returnStatus && (returnStatus.code === 1000 || returnStatus.code === 3))){
