@@ -38,7 +38,7 @@ function ConnectWallet() {
         if(!pubKey.status) {
             let balanceOF = await getRootBalanceOF()
             if(!balanceOF.balanceOf[msigAd]) {
-                setcurrentStatus("transfer - transferring funds to root")
+                setcurrentStatus("transfer - transferring funds to root.")
                 let tranferToDex = await transfer(curExt._extLib.SendTransfer, Radiance.networks['2'].dexroot, 10000000000)
                 if (tranferToDex && tranferToDex.code) {
                     console.log("tranferToDex",tranferToDex)
@@ -56,7 +56,7 @@ function ConnectWallet() {
                     return
                 }
             }
-            setcurrentStatus("setCreator - registering your wallet on dex")
+            setcurrentStatus("setCreator - registering your wallet on dex.")
                 let dexCLientStatus = await setCreator(curExt);
             console.log("dexCLientStatus",dexCLientStatus)
             if((dexCLientStatus && dexCLientStatus.code) || !dexCLientStatus.status){
@@ -66,12 +66,12 @@ function ConnectWallet() {
                 dispatch(setCurExt(""));
                 return
             }else if(dexCLientStatus.status){
-                setcurrentStatus("onSharding - looking for the best shard for you")
+                setcurrentStatus("onSharding - looking for the best shard for you.")
                 console.log("i am on sharding")
                 let onShardingStatus = await onSharding(curExt._extLib.pubkey)
                 console.log("onSharding",onShardingStatus)
                 if(onShardingStatus.status){
-                    setcurrentStatus("createDEXclient - last step deploy dex client")
+                    setcurrentStatus("Last step! Deploying your DeX client wallet.")
                     let createCLientStatus = await createDEXclient(curExt,onShardingStatus.data)
                     if(!createCLientStatus.status){
                         dispatch(closeConnecting());

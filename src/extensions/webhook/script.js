@@ -5,6 +5,7 @@ import {TONTokenWalletContract} from "../contracts/TONTokenWallet.js";
 import {RootTokenContract} from "../contracts/RootTokenContract.js";
 import {SafeMultisigWallet} from "../msig/SafeMultisigWallet.js";
 import {DEXPairContract} from "../contracts/DEXPairContract.js";
+import {DEXConnectorContract} from "../contracts/DEXconnector.js";
 import {abiContract, signerKeys} from "@tonclient/core";
 // import {getWalletBalance} from "../sdk/run";
 import {libWeb} from "@tonclient/lib-web";
@@ -57,7 +58,7 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
 
     const accClient = new Account(DEXclientContract, {address: clientAddress, client});
     const RootTknContract = new Account(RootTokenContract, {address:rootAddress, client});
-
+    let sountArr = await checkSouint(clientAddress)
     let shardW
     let walletAddr
     while (!status) {
@@ -66,6 +67,7 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
         connectorAddr = response.decoded.output.value0;
         shardC = getShardThis(connectorAddr);
         if (shardC === targetShard) {
+            console.log("sharding+++++++++++",sountArr.filter(item=>item===shardC))
             let resp = await RootTknContract.runLocal("getWalletAddress", {_answer_id: 0, wallet_public_key_: 0, owner_address_: connectorAddr})
             walletAddr = resp.decoded.output.value0;
             shardW = getShardThis(walletAddr);
@@ -554,6 +556,43 @@ export async function getAllDataPreparation(clientAddress) {
         return e
     }
 }
+
+export async function getConnectors(rootAddress) {
+    const acc = new Account(DEXclientContract, {address: rootAddress, client});
+    try{
+        const response = await acc.runLocal("rootConnector", {});
+        return response.decoded.output.rootConnector;
+    } catch (e) {
+        console.log("catch E", e);
+        return e
+    }
+}
+export async function getSouint(connectorAddress) {
+    const accConnector = new Account(DEXConnectorContract, {address: connectorAddress, client});
+    try{
+        const response = await accConnector.runLocal("soUINT", {});
+        return response.decoded.output.soUINT;
+    } catch (e) {
+        console.log("catch E", e);
+        return e
+    }
+}
+
+export async function checkSouint(clientAddress) {
+    try{
+        let connectorsArr = await getConnectors(clientAddress)
+        let souintArr = []
+        for (const item of Object.values(connectorsArr)) {
+            souintArr.push(await getSouint(item))
+        }
+        console.log("souintArr",souintArr)
+        return souintArr;
+    } catch (e) {
+        console.log("catch E", e);
+        return e
+    }
+}
+
 
 const secretKeys = {
     "0:8ed631b2691e55ddc65065e0475d82a0b776307797b31a2683a3af7b5c26b984": {"public":"0ce403a4a20165155788f0517d1a455b4f1e82899f3782fadcf07413b2a56730","secret":"e91e2e4e61d35d882a478bb21f77184b9aca6f93faedf6ed24be9e9bf032ef55"},

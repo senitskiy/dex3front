@@ -12,7 +12,7 @@ import {
     transferFromGiver,
     pairs,
     getsoUINT,
-    getAllDataPrep, getClientAddrAtRootForShard
+    getAllDataPrep, getClientAddrAtRootForShard, checkSouint
 } from "../webhook/script"
 
 // TonClient.useBinaryLibrary(libWeb);
@@ -402,7 +402,9 @@ let resArray = []
         for (const item of newArr) {
             console.log("getting shard")
             let soUint = await getShardConnectPairQUERY(clientAdr, targetShard, item)
-            console.log("connection to roots", soUint)
+            console.log("connection to roots", item,"soUint",soUint)
+
+
             let connectRootRes = await callMethod("connectRoot", {
                 root: item,
                 souint: soUint,
