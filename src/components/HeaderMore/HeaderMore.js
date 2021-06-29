@@ -34,7 +34,7 @@ function HeaderMore() {
             </svg>
             <span onClick={() => href("Github")} className="more-link-text">Github</span>
           </Link>
-          <p style={{ color: 'grey' }}>v.0.1.18</p>                   
+          <p style={{ color: 'grey' }}>v.O.1.18</p>                   
         </div>
       ) : null}
     </button>
