@@ -144,7 +144,7 @@ console.log("pair", pairId)
         )}
       </>}
 
-      { manageAsyncIsWaiting && <WaitingPopup text={`Removing ${qtyA < 0.0001 ? parseFloat(qtyA.toFixed(8)) : parseFloat(qtyA.toFixed(4))} ${fromToken.symbol} and ${qtyB < 0.0001 ? parseFloat(qtyB.toFixed(8)) : parseFloat(qtyB.toFixed(4))}} ${toToken.symbol}`} /> }
+      { manageAsyncIsWaiting && <WaitingPopup text={`Removing ${qtyA < 0.0001 ? parseFloat(qtyA.toFixed(8)) : parseFloat(qtyA.toFixed(4))} ${fromToken.symbol} and ${qtyB < 0.0001 ? parseFloat(qtyB.toFixed(8)) : parseFloat(qtyB.toFixed(4))} ${toToken.symbol}`} /> }
     </div>
   )
 }

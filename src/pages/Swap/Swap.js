@@ -121,7 +121,7 @@ if(!pairsList.length || !pairId){
       // console.log("notDeployedWallets",notDeployedWallets)
 
     setconnectAsyncIsWaiting(true);
-      setconnectPairStatusText("getting data from pair")
+      setconnectPairStatusText("Getting data from pair.")
         let connectRes = await connectToPair(curExt, pairId, curPia);
 
       console.log("connectRes",connectRes)
@@ -130,14 +130,14 @@ if(!pairsList.length || !pairId){
           setconnectAsyncIsWaiting(false);
             return
       }else{
-          setconnectPairStatusText("getClientForConnect - preparing client data")
+          setconnectPairStatusText("Preparing client data.")
           let getClientForConnectStatus = await getClientForConnect(connectRes)
           console.log("getClientForConnectStatus",getClientForConnectStatus)
             if(getClientForConnectStatus.code){
                     setconnectAsyncIsWaiting(false);
                     return
             }else{
-                setconnectPairStatusText("compute best shard for you and deploy wallets")
+                setconnectPairStatusText("Computing the best shard for your wallets and deploying.")
                 let connectToRootsStatus = await connectToPairStep2DeployWallets(getClientForConnectStatus)
                 console.log("connectToRootsStatus",connectToRootsStatus)
                 if(connectToRootsStatus.code){
