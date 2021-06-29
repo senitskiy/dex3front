@@ -58,7 +58,7 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
 
     const accClient = new Account(DEXclientContract, {address: clientAddress, client});
     const RootTknContract = new Account(RootTokenContract, {address:rootAddress, client});
-    let sountArr = await checkSouint(clientAddress)
+    // let sountArr = await checkSouint(clientAddress)
     let shardW
     let walletAddr
     while (!status) {
@@ -67,7 +67,7 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
         connectorAddr = response.decoded.output.value0;
         shardC = getShardThis(connectorAddr);
         if (shardC === targetShard) {
-            console.log("sharding+++++++++++",sountArr.filter(item=>item===shardC))
+            // console.log("sharding+++++++++++",sountArr.filter(item=>item===shardC))
             let resp = await RootTknContract.runLocal("getWalletAddress", {_answer_id: 0, wallet_public_key_: 0, owner_address_: connectorAddr})
             walletAddr = resp.decoded.output.value0;
             shardW = getShardThis(walletAddr);

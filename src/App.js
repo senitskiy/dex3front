@@ -103,7 +103,7 @@ const [onloading,setonloading] = useState(false)
       dispatch(setCurExt(curExtt));
         subscribeClient(pubKey2.dexclient)
     }
-      checkSouint(pubKey2.dexclient)
+      // checkSouint(pubKey2.dexclient)
 
     const wallet =
         // localStorage.getItem('wallet') === null ?
