@@ -3,7 +3,7 @@ import "./MainBlock.scss";
 
 function MainBlock(props) {
   function classGenerator() {
-    let str = 'mainblock-title';    
+    let str = 'mainblock-title';
 
     if(props.smallTitle) { str += " mainblock-title--small" }
     if(props.normalTitle) { str += " mainblock-title--normal" }

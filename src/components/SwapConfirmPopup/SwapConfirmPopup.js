@@ -8,7 +8,7 @@ import CloseBtn from '../CloseBtn/CloseBtn';
 import MainBlock from '../MainBlock/MainBlock';
 import { iconGenerator } from '../../iconGenerator';
 import miniSwap from '../../images/icons/mini-swap.png';
-import { checkClientPairExists, getAllClientWallets, subscribe } from '../../extensions/webhook/script';
+import { checkClientPairExists, getAllClientWallets} from '../../extensions/webhook/script';
 import './SwapConfirmPopup.scss';
 import {setManageAsyncIsWaiting} from "../../store/actions/manage";
 

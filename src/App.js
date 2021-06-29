@@ -3,7 +3,16 @@ import {useSelector, useDispatch} from 'react-redux';
 import {Switch, Route, Redirect, useLocation, useHistory} from 'react-router-dom';
 import {changeTheme, setCurExt, setExtensionsList, setWalletIsConnected, showPopup} from './store/actions/app';
 import {setLiquidityList, setPairsList, setPubKey, setSubscribeData, setTokenList, setTransactionsList, setWallet} from './store/actions/wallet';
-import { getAllClientWallets, getAllPairsWoithoutProvider, getClientBalance,checkPubKey, subscribe,checkClientPairExists,checkwalletExists } from './extensions/webhook/script';
+import {
+    getAllClientWallets,
+    getAllPairsWoithoutProvider,
+    getClientBalance,
+    checkPubKey,
+    subscribe,
+    checkClientPairExists,
+    checkwalletExists,
+    subscribeClient
+} from './extensions/webhook/script';
 import { checkExtensions, getCurrentExtension } from './extensions/extensions/checkExtensions';
 import {
     setSwapAsyncIsWaiting,
@@ -92,6 +101,7 @@ const [onloading,setonloading] = useState(false)
     if(pubKey2.status){
       dispatch(setPubKey(pubKey2));
       dispatch(setCurExt(curExtt));
+        subscribeClient(pubKey2.dexclient)
     }
 
 
@@ -134,7 +144,11 @@ const [onloading,setonloading] = useState(false)
     let liquidityList = [];
     // console.log('token list',tokenList,"pubKey.address",pubKey.address);
     if(tokenList.length) {
-      tokenList.forEach(async item => await subscribe(item.walletAddress));
+        console.log("tokenList",tokenList)
+
+
+
+        tokenList.forEach(async item => await subscribe(item.walletAddress));
 
       liquidityList = tokenList.filter(i => i.symbol.includes('/'));
 
@@ -185,10 +199,33 @@ console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey2.d
             if (transactionsList.length) dispatch(setTransactionsList(transactionsList));
         }
 
+        if(subscribeData.name === "connectCallback") {
+            console.log("subscribeData at collback", subscribeData)
+            const pairs = await getAllPairsWoithoutProvider();
 
+            let arrPairs = [];
+            await pairs.map(async item=>{
+                item.exists = await checkClientPairExists(pubKey2.dexclient, item.pairAddress)
+                item.walletExists = await checkwalletExists(pubKey2.dexclient, item.pairAddress)
+                arrPairs.push(item)
+            })
+            console.log("pairspairspairs",pairs)
+            dispatch(setPairsList(arrPairs));
+        }
+        if(subscribeData.name === "accept") {
+            const pairs = await getAllPairsWoithoutProvider();
+            let arrPairs = [];
+            await pairs.map(async item=>{
+                item.exists = await checkClientPairExists(pubKey2.dexclient, item.pairAddress)
+                item.walletExists = await checkwalletExists(pubKey2.dexclient, item.pairAddress)
+                arrPairs.push(item)
+            })
+            console.log("pairspairspairs",pairs)
+            dispatch(setPairsList(arrPairs));
+        }
 
       dispatch(setWallet({id: pubKey.address, balance: clientBalance}));
-
+        subscribeClient(pubKey2.dexclient)
 
 
         // const pairs = await getAllPairsWoithoutProvider();
@@ -208,7 +245,8 @@ console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey2.d
       console.log(9999395394583590, tokenList)
 
       if(tokenList.length) {
-        tokenList.forEach(async item => await subscribe(item.walletAddress));
+
+          tokenList.forEach(async item => await subscribe(item.walletAddress));
 
         liquidityList = tokenList.filter(i => i.symbol.includes('/'));
 

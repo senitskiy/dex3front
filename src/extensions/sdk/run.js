@@ -158,10 +158,12 @@ export async function createDEXclient(curExt, shardData) {
         console.log("checkDexClientExists",checkDexClientExists)
         while(!checkDexClientExists.status){
             checkDexClientExists =  await checkPubKey(pubkey);
-            n++
-            if(n>800){
+
+            if(n>1500){
+                console.log({status:false,text:"checking pubkey failed"})
                 return {status:false,text:"checking pubkey failed"}
             }
+            n++
         }
         return checkDexClientExists
     } catch (e) {
@@ -276,6 +278,7 @@ export async function returnLiquidity(curExt,pairAddr, tokens) {
 export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
     // let curExt = {};
     // await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+    console.log(pairAddr, qtyA, qtyB, "===============")
     const {pubkey, contract, SendTransfer, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
 
@@ -303,68 +306,71 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
 
 export async function connectToPair(curExt,pairAddr,curPia) {
     // console.log("pairAddr",pairAddr,"curExt",curExt)
-    const {contract,callMethod,runMethod,pubkey,SendTransfer} = curExt._extLib
+    const {contract,callMethod,pubkey} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){
         return getClientAddressFromRoot
     }
-console.log("curPia",curPia)
+// console.log("curPia",curPia)
     // transferFromGiver(getClientAddressFromRoot.dexclient, 4500000000).then(res=>console.log("secess transfered from giver",res))
 
     // let checkClientBalance = await getClientBalance(getClientAddressFromRoot.dexclient)
     // if(6000000000 > (checkClientBalance*1000000000)){
     //     await transfer(SendTransfer,getClientAddressFromRoot.dexclient,8000000000)
     // }
-
+    // console.log("getClientAddressFromRoot",getClientAddressFromRoot)
+    // let pairsTT = await pairs(getClientAddressFromRoot && getClientAddressFromRoot.dexclient)
+    //
+    //
+    //   let curP = pairsTT[pairAddr]
+    //
+    //
+    //
+    // if(!curP){
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
-        let connectRes= await callMethod("connectPair", {pairAddr: pairAddr}, clientContract)
-        console.log("connectRes",connectRes)
-        if(!connectRes || (connectRes && (connectRes.code === 1000 || connectRes.code === 3))){
-
+        let connectRes = await callMethod("connectPair", {pairAddr: pairAddr}, clientContract)
+        // console.log("connectRes",connectRes)
+        if (!connectRes || (connectRes && (connectRes.code === 1000 || connectRes.code === 3))) {
             return connectRes
+        } else {
+            return {
+                pairAddr: pairAddr,
+                callMethod: callMethod,
+                contract: contract,
+                clientAddress: getClientAddressFromRoot.dexclient,
+                clientContract: clientContract
+            }
         }
-
-        return await getClientForConnect({
-            pairAddr: pairAddr,
-            runMethod: runMethod,
-            callMethod: callMethod,
-            contract: contract,
-            clientAddress: getClientAddressFromRoot.dexclient,
-            clientContract: clientContract
-        })
-
     } catch (e) {
         return e
     }
+    // }else{
+    //     return {status:true,text:"you are already connected to pair"}
+    // }
+
+
 }
 
 export async function getClientForConnect(data) {
-    const {pairAddr, clientAddress, contract, runMethod, callMethod,clientContract} = data
+    const {pairAddr, clientAddress, contract, callMethod,clientContract} = data
     try {
-        // let soUINT = await runMethod("soUINT", {}, clientContract)
         let soUINT = await getsoUINT(clientAddress)
-        console.log("soUINT",soUINT)
-        // let pairs = await runMethod("pairs", {}, clientContract)
         let pairsT = await pairs(clientAddress)
-
-        // let clientRoots = await runMethod("getAllDataPreparation", {}, clientContract)
         let clientRoots = await getAllDataPrep(clientAddress)
-        console.log("soUINT",soUINT,"pairs",pairsT,"clientRoots",clientRoots)
         let curPair = null
         let n=0
 
         while (!curPair){
             pairsT = await pairs(clientAddress)
-            console.log("pairs.pairs[pairAddr]",pairsT[pairAddr])
             curPair = pairsT[pairAddr]
             n++
             if(n>500){
                 return {code:3,text:"time limit in checking cur pair"}
             }
         }
-        console.log("cure pair finded")
-        return await connectToPairStep2DeployWallets({...soUINT, curPair,clientAdr:clientAddress,callMethod,clientContract,contract:contract,clientRoots:clientRoots.rootKeysR})
+        // console.log("cure pair finded")
+        return {...soUINT, curPair,clientAdr:clientAddress,callMethod,clientContract,contract:contract,clientRoots:clientRoots.rootKeysR}
     } catch (e) {
         console.log("catch E", e);
         return e
@@ -375,33 +381,57 @@ export async function getClientForConnect(data) {
 
 export async function connectToPairStep2DeployWallets(connectionData) {
     let { curPair,clientAdr,callMethod, clientContract,clientRoots} = connectionData;
-
-    console.log("connectionData",connectionData)
     let targetShard = getShard(clientAdr);
     let cureClientRoots = [curPair.rootA,curPair.rootB,curPair.rootAB]
+    console.log("cureClientRoots",cureClientRoots)
+    console.log("clientRoots",clientRoots)
     let newArr = cureClientRoots.filter(function(item) {
         return clientRoots.indexOf(item) === -1;
     });
-    console.log("newArr",newArr)
     if(newArr.length===0){
-        return new UserException("y already have all pair wallets")
+        return {code:3,text:"y already have all pair wallets"}
     }
-    try{
-        let amountOfWallets = 0
+let resArray = []
 
+    try {
         for (const item of newArr) {
             console.log("getting shard")
-            let soUint = await getShardConnectPairQUERY(clientAdr,targetShard,item)
-            console.log("connection to roots",soUint)
-            await callMethod("connectRoot", {root: item, souint:soUint,gramsToConnector:500000000,gramsToRoot:1500000000}, clientContract)
-            amountOfWallets++
+            let soUint = await getShardConnectPairQUERY(clientAdr, targetShard, item)
+            console.log("connection to roots", soUint)
+            let connectRootRes = await callMethod("connectRoot", {
+                root: item,
+                souint: soUint,
+                gramsToConnector: 500000000,
+                gramsToRoot: 1500000000
+            }, clientContract)
+            resArray.push(connectRootRes)
+            console.log("connectRootRes.code", resArray)
+            if (connectRootRes.code) {
+                console.log("connectRootRes.code", connectRootRes.code)
+                return connectRootRes
+            }
         }
-        return {status:"success",amountOfWallets:amountOfWallets}
-        // )
-    }catch (e) {
-        console.log("this",e)
+        return {status: "success", resArray: resArray}
+    }catch(e){
+        console.log("connectRoot e")
         return e
     }
+
+    // let connectedItem = []
+    // newArr.map(async (item,i)=> {
+    //     connectedItem.push(await connectToPairDeployWallets(connectToRootsStatus,item))
+    // })
+    // console.log("connectedItem-----------------",connectedItem)
+    // return {newArr:newArr,clientAdr:clientAdr,targetShard:targetShard,clientContract:clientContract,callMethod:callMethod}
 }
 
+// export async function connectToPairDeployWallets(data,item){
+    // let { clientAdr,targetShard,clientContract,callMethod } = data
+    // let soUint = await getShardConnectPairQUERY(clientAdr,targetShard,item)
+    // console.log("connection to roots",soUint)
+//     let connectStatus = await callMethod("connectRoot", {root: item, souint:soUint,gramsToConnector:500000000,gramsToRoot:1500000000}, clientContract)
+//
+// return {status:"success", connectStatus:connectStatus,connectedRoot:item}
+        // )
 
+// }

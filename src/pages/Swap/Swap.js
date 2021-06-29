@@ -9,7 +9,13 @@ import SwapConfirmPopup from '../../components/SwapConfirmPopup/SwapConfirmPopup
 import WaitingPopup from '../../components/WaitingPopup/WaitingPopup';
 import WaitingPopupConnect from '../../components/WaitingPopupConnect/WaitingPopupConnectConnect';
 import './Swap.scss';
-import {connectToPair, setCreator} from "../../extensions/sdk/run"
+import {
+    connectToPair,
+    connectToPairDeployWallets,
+    connectToPairStep2DeployWallets,
+    getClientForConnect,
+    setCreator
+} from "../../extensions/sdk/run"
 import {checkClientPairExists, getAllClientWallets, subscribe} from "../../extensions/webhook/script";
 import {setLiquidityList, setTokenList} from "../../store/actions/wallet";
 import {setSwapAsyncIsWaiting} from "../../store/actions/swap";
@@ -44,14 +50,16 @@ function Swap () {
   const [curExist, setExistsPair] = useState(false);
     const [curPia, setCurrentPair] = useState([]);
     const [notDeployedWallets, setNotDeployedWallets] = useState([]);
+    const [connectPairStatusText, setconnectPairStatusText] = useState("");
 
   useEffect(()=>{
-if(!pairsList || !pairId){
-  console.log("pairsList CKECK 0",pairsList)
+if(!pairsList.length || !pairId){
+  // console.log("pairsList CKECK 0",pairsList)
   return
 }
-      if(!curePairData || !curePairData[0])return
-   let curePairData = pairsList.filter(item=>item.pairAddress===pairId)
+      // if(!curePairData || !curePairData[0])return
+   let curePairData = pairsList && pairsList.filter(item=>item.pairAddress===pairId)
+      console.log("pairsList CKECK 0",pairsList, "pairId",pairId)
     setExistsPair(curePairData[0].exists)
       setCurrentPair(curePairData)
 
@@ -61,34 +69,16 @@ if(!pairsList || !pairId){
 
     // console.log("walExists",walExists)
 
-  },[pairsList, pairId])
-
-    useEffect(()=>{
-        if(!pairsList || !pairId){
-            console.log("pairsList CKECK 0",pairsList)
-            return
-        }
-        if(!curePairData || !curePairData[0])return
-        let curePairData = pairsList.filter(item=>item.pairAddress===pairId)
-        setExistsPair(curePairData[0].exists)
-        setCurrentPair(curePairData)
-
-        //  if(!curePairData || !curePairData[0])return
-        //  let walExists = curePairData[0].walletExists.filter(item=>item.status===false)
-        // setNotDeployedWallets(walExists)
-
-        // console.log("walExists",walExists)
-
-    },[pairsList, pairId])
+  },[tokenList,pairsList, pairId])
 
 
     useEffect(()=>{
         if(!pairsList || !pairId){
-            console.log("pairsList CKECK 0",pairsList)
+            // console.log("pairsList CKECK 0",pairsList)
             return
         }
         let curePairData = pairsList.filter(item=>item.pairAddress===pairId)
-        console.log("curePairData",curePairData)
+        // console.log("curePairData",curePairData)
 
         if(!curePairData || !curePairData[0])return
         if(curePairData[0].walletExists) {
@@ -97,7 +87,7 @@ if(!pairsList || !pairId){
         }
 
 
-    },[toToken])
+    },[toToken,tokenList,pairId])
 
 
 
@@ -107,7 +97,7 @@ if(!pairsList || !pairId){
 
   function handleConfirm() {
     if(fromValue > fromToken.balance){
-        console.log("return",fromValue, "____", fromToken.balance)
+        // console.log("return",fromValue, "____", fromToken.balance)
         setincorrectBalance(true)
         setTimeout(() => setincorrectBalance(false), 200);
         return
@@ -126,20 +116,55 @@ if(!pairsList || !pairId){
     }
   }
   async function handleConnectPair() {
-      console.log("22",curExist)
+      // console.log("22",curExist)
 
-      console.log("notDeployedWallets",notDeployedWallets)
+      // console.log("notDeployedWallets",notDeployedWallets)
 
     setconnectAsyncIsWaiting(true);
+      setconnectPairStatusText("getting data from pair")
         let connectRes = await connectToPair(curExt, pairId, curPia);
 
-
-      if(!connectRes || (connectRes && (connectRes.code === 1000 || connectRes.code === 3))){
-          console.log("connectRes",connectRes)
+      console.log("connectRes",connectRes)
+      if(!connectRes || (connectRes && (connectRes.code === 1000 || connectRes.code === 3 || connectRes.code === 2))){
+          // console.log("connectRes",connectRes)
           setconnectAsyncIsWaiting(false);
+            return
+      }else{
+          setconnectPairStatusText("getClientForConnect - preparing client data")
+          let getClientForConnectStatus = await getClientForConnect(connectRes)
+          console.log("getClientForConnectStatus",getClientForConnectStatus)
+            if(getClientForConnectStatus.code){
+                    setconnectAsyncIsWaiting(false);
+                    return
+            }else{
+                setconnectPairStatusText("compute best shard for you and deploy wallets")
+                let connectToRootsStatus = await connectToPairStep2DeployWallets(getClientForConnectStatus)
+                console.log("connectToRootsStatus",connectToRootsStatus)
+                if(connectToRootsStatus.code){
+                    setconnectAsyncIsWaiting(false);
+                    return
+                }
+//                 else{
+//                     // return {newArr:newArr,clientAdr:clientAdr,targetShard:targetShard,clientContract:clientContract,callMethod:callMethod}
+//                     let connectedItem = []
+//                     connectToRootsStatus.newArr.map(async (item,i)=> {
+//                         connectedItem.push(await connectToPairDeployWallets(connectToRootsStatus,item))
+//                     })
+// console.log("connectedItem-----------------",connectedItem)
+//                 }
+            }
 
-      }else {
+
+
+      }
+
+
+
+      setconnectPairStatusText("")
+
+
           let tokenList = await getAllClientWallets(pubKey.address);
+      tokenList.forEach(async item => await subscribe(item.walletAddress));
           let countT = tokenList.length
           let y = 0
           while (tokenList.length < countT) {
@@ -177,17 +202,17 @@ if(!pairsList || !pairId){
           }
           setconnectAsyncIsWaiting(false);
           // setExistsPair(true)
-      }
+
   }
 
   function getCurBtn(){
-      console.log("22",curPia)
+      // console.log("22",curPia)
           if(curExist && fromToken.symbol && toToken.symbol && !notDeployedWallets.length){
               console.log(1,curExist)
 
           return <button className={(fromToken.symbol && toToken.symbol && fromValue && toValue) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConfirm()}>Swap</button>
       }else if((!curExist || notDeployedWallets.length) && fromToken.symbol && toToken.symbol){
-              console.log(2)
+              console.log("curExist",curExist,"notDeployedWallets.length",notDeployedWallets.length)
 
               return <button className={(fromToken.symbol && toToken.symbol) ? "btn mainblock-btn" : "btn mainblock-btn btn--disabled"} onClick={() => handleConnectPair()}>Connect pair</button>
       }
@@ -239,7 +264,7 @@ if(!pairsList || !pairId){
         )}
 
         { swapConfirmPopupIsVisible && <SwapConfirmPopup hideConfirmPopup={setSwapConfirmPopupIsVisible.bind(this, false)} /> }
-        { connectAsyncIsWaiting && <WaitingPopupConnect text={`Connecting to ${fromToken.symbol}/${toToken.symbol} pair`} /> }
+        { connectAsyncIsWaiting && <WaitingPopupConnect text={`Connecting to ${fromToken.symbol}/${toToken.symbol} pair, ${connectPairStatusText}`} /> }
         { swapAsyncIsWaiting && <WaitingPopup text={`Swapping ${fromValue} ${fromToken.symbol} for ${toValue} ${toToken.symbol}`} /> }
 
     </div>
