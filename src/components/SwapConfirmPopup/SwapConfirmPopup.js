@@ -85,6 +85,7 @@ function SwapConfirmPopup(props) {
       try {
         await pairsList.forEach(async i => {
           if(fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
+            console.log("swap fromValue",fromValue)
             let res = await swapA(curExt, pairId, fromValue * 1000000000);
             if(!res || (res && (res.code === 1000 || res.code === 3))){
               dispatch(setSwapAsyncIsWaiting(false))
@@ -110,6 +111,7 @@ function SwapConfirmPopup(props) {
 
             }
           } else if(fromToken.symbol === i.symbolB && toToken.symbol === i.symbolA) {
+            console.log("swap B fromValue",fromValue)
             let res = await swapB(curExt, pairId, fromValue * 1000000000);
             // if(!res){
             //   dispatch(showPopup({type: 'error', message: 'Oops, something went wrong. Please try again.'}));

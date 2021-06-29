@@ -252,6 +252,7 @@ export async function swapB(curExt,pairAddr, qtyB) {
 export async function returnLiquidity(curExt,pairAddr, tokens) {
     // let curExt = {};
     // await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
+    console.log(pairAddr, tokens.toFixed(),"pairAddr, tokens")
     const {pubkey, contract, SendTransfer, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){
@@ -259,7 +260,7 @@ export async function returnLiquidity(curExt,pairAddr, tokens) {
     }
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
-        const returnLiquidity = await callMethod("returnLiquidity", {pairAddr:pairAddr, tokens: tokens}, clientContract)
+        const returnLiquidity = await callMethod("returnLiquidity", {pairAddr:pairAddr, tokens: tokens.toFixed()}, clientContract)
         transferFromGiver(getClientAddressFromRoot.dexclient, 300000000).then(res=>console.log("sucess ended",res))
         return returnLiquidity
     } catch (e) {
@@ -278,7 +279,11 @@ export async function returnLiquidity(curExt,pairAddr, tokens) {
 export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
     // let curExt = {};
     // await checkExtensions().then(async res => curExt = await getCurrentExtension(res))
-    console.log(pairAddr, qtyA, qtyB, "===============")
+    console.log("===============", typeof qtyA, typeof qtyB, "===============")
+
+    let qtyAnum = Number(qtyA)
+    let qtyBnum = Number(qtyB)
+    console.log(pairAddr, qtyAnum, qtyBnum, "===============")
     const {pubkey, contract, SendTransfer, callMethod} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
 
@@ -287,7 +292,7 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
     }
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
-        const processLiquidity = await callMethod("processLiquidity", {pairAddr:pairAddr, qtyA:Number(qtyA).toFixed(0), qtyB:Number(qtyB).toFixed(0)}, clientContract)
+        const processLiquidity = await callMethod("processLiquidity", {pairAddr:pairAddr, qtyA:qtyAnum.toFixed(), qtyB:qtyBnum.toFixed()}, clientContract)
         transferFromGiver(getClientAddressFromRoot.dexclient, 300000000).then(res=>console.log("sucess ended",res))
         return processLiquidity
     } catch (e) {
