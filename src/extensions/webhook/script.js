@@ -571,6 +571,8 @@ export async function getSouint(connectorAddress) {
     const accConnector = new Account(DEXConnectorContract, {address: connectorAddress, client});
     try{
         const response = await accConnector.runLocal("soUINT", {});
+        const response2 = await accConnector.runLocal("statusConnected", {});
+        console.log("response2.decoded.output.soUINT",response2.decoded.output.statusConnected)
         return response.decoded.output.soUINT;
     } catch (e) {
         console.log("catch E", e);
