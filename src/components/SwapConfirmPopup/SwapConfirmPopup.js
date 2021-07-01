@@ -185,8 +185,8 @@ function SwapConfirmPopup(props) {
       rootIn = reserves[0].reserveA
       rootOut = reserves[0].reservetB
     }else{
-      rootIn = reserves[0].reserveA
-      rootOut = reserves[0].reservetB
+      rootIn = reserves[0].reservetB
+      rootOut = reserves[0].reserveA
     }
     })
 
