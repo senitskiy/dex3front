@@ -145,8 +145,10 @@ function Input(props) {
   }
   const [changer,setChanger] = useState(0)
   useEffect(()=>{
+if(swapFromToken.symbol && swapToToken.symbol){
+  setValue(changer)
+}
 
-    setValue(changer)
   },[changer])
   useEffect(()=>{
 
