@@ -141,13 +141,14 @@ function Input(props) {
     }
   }
   function handleKeyPress(event) {
+    console.log(event, "evern")
     if(event.key === '-' || event.key === '+') { event.preventDefault() }
   }
   const [changer,setChanger] = useState(0)
   useEffect(()=>{
-
+    console.log(changer, "changer")
     if(location.pathname.includes('swap') && swapFromToken.symbol && swapToToken.symbol) {
-
+      // if()
       setValue(changer)
     }
     if(location.pathname.includes('add-liquidity') && poolFromToken.symbol && poolToToken.symbol) {
