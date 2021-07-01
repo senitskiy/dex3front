@@ -73,7 +73,7 @@ console.log("curPair",curPair)
                   <p className="mainblock-footer-subtitle">Your total pool tokens</p>
                 </div>
                 <div className="swap-confirm-wrap">
-                  <p className="mainblock-footer-value">{poolShare.toFixed(4)}</p>
+                  <p className="mainblock-footer-value">{poolShare.toFixed(4)} %</p>
                   <p className="mainblock-footer-subtitle">Your pool share</p>
                 </div>
               </div>
