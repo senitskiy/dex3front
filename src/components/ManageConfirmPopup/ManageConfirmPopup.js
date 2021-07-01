@@ -58,7 +58,7 @@ console.log("curPair",curPair)
               <span className="confirm-value">{parseFloat(balance.toFixed(4))}</span>
               <img className="confirm-icon" src={iconGenerator(fromToken.symbol)} alt={fromToken.symbol} />
               <img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol} />
-              <span className="confirm-token">{fromToken.symbol}/{toToken.symbol}</span>
+              <span className="confirm-token">DS-{fromToken.symbol}/{toToken.symbol} LP Tokens</span>
             </div>
             <button onClick={handleSupplyClick} to={'/add-liquidity'} className="btn popup-btn">Supply</button>
             {balance !== 0 ? <div className="manage-remove-link"><span onClick={() => props.func()}>Remove</span></div> : null}

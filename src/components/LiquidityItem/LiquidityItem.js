@@ -40,7 +40,7 @@ function LiquidityItem({symbol, balance}) {
       <div>
         <img src={iconGenerator(symbols[0])} alt={symbols[0]} />
         <img src={iconGenerator(symbols[1])} alt={symbols[1]} />
-        <span className="liquidity-item-text">{symbols[0]}/{symbols[1]}</span>
+        <span className="liquidity-item-text">{symbols[0]}/{symbols[1]} LP Tokens</span>
       </div>
       <button onClick={handleClick} className="liquidity-item-btn">Manage</button>
     </div>
