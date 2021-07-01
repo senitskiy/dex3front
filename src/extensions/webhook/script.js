@@ -62,7 +62,7 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
     // web3.utils.toBN(String(totalSupply) + "0".repeat(decimalPrecision)),
     let largestNum = sountArr.sort().pop()
     console.log("sountArr==========", sountArr,largestNum)
-    let n = largestNum;
+    let n = largestNum || 0;
     let shardW
     let walletAddr
     while (!status) {
@@ -77,7 +77,7 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
             shardW = getShardThis(walletAddr);
             if (shardW === targetShard) {
 
-                console.log("sharding+++++++++++",!sountArr.filter(item=>item===shardW).length)
+                console.log("sharding+++++++++++",!sountArr.filter(item=>item===shardW).length,n)
                 connectorSoArg0 = n;
                 status = true;
             } else {
