@@ -38,7 +38,7 @@ function ConnectWallet() {
         if(!pubKey.status) {
             let balanceOF = await getRootBalanceOF()
             if(!balanceOF.balanceOf[msigAd]) {
-                setcurrentStatus("transfer - transferring funds to root.")
+                setcurrentStatus("Transfering TONs to your Gas wallet inside the DeX for future operational costs.")
                 let tranferToDex = await transfer(curExt._extLib.SendTransfer, Radiance.networks['2'].dexroot, 10000000000)
                 if (tranferToDex && tranferToDex.code) {
                     console.log("tranferToDex",tranferToDex)
@@ -118,12 +118,7 @@ function ConnectWallet() {
 
                 liquidityList = tokenList.filter(i => i.symbol.includes('/'));
 
-                tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
-                    {
-                        ...i,
-                        symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
-                    })
-                );
+                tokenList = tokenList.filter(i => !i.symbol.includes('/'))
 
                 dispatch(setTokenList(tokenList));
                 dispatch(setLiquidityList(liquidityList));

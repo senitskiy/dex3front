@@ -152,12 +152,7 @@ const [onloading,setonloading] = useState(false)
 
       liquidityList = tokenList.filter(i => i.symbol.includes('/'));
 
-      tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
-          {
-            ...i,
-            symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
-          })
-      );
+      tokenList = tokenList.filter(i => !i.symbol.includes('/'))
       //localStorage.setItem('tokenList', JSON.stringify(tokenList));
       //localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
       dispatch(setTokenList(tokenList));
@@ -249,12 +244,7 @@ console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey2.d
 
         liquidityList = tokenList.filter(i => i.symbol.includes('/'));
 
-        tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
-          {
-            ...i,
-            symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
-          })
-        );
+        tokenList = tokenList.filter(i => !i.symbol.includes('/'))
           localStorage.setItem('tokenList', JSON.stringify(tokenList));
           localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
         dispatch(setTokenList(tokenList));
@@ -292,6 +282,7 @@ console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey2.d
         dispatch(setPoolFromInputValue(0));
         dispatch(setPoolToInputValue(0));
         dispatch(setPoolAsyncIsWaiting(false));
+        history.push("/pool")
       } else if(manageAsyncIsWaiting) {
         dispatch(showPopup({type: 'success', link: subscribeData.transactionID}));
         dispatch(setManageFromToken({

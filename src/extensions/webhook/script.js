@@ -52,13 +52,17 @@ export async function transferFromGiver(addr, count) {
 export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAddress) {
     let connectorSoArg0;
     let status = false;
-    let n = 0;
+
     let shardC
     let connectorAddr
 
     const accClient = new Account(DEXclientContract, {address: clientAddress, client});
     const RootTknContract = new Account(RootTokenContract, {address:rootAddress, client});
-    // let sountArr = await checkSouint(clientAddress)
+    let sountArr = await checkSouint(clientAddress)
+    // web3.utils.toBN(String(totalSupply) + "0".repeat(decimalPrecision)),
+    let largestNum = sountArr.sort().pop()
+    console.log("sountArr==========", sountArr,largestNum)
+    let n = largestNum;
     let shardW
     let walletAddr
     while (!status) {
@@ -67,11 +71,13 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
         connectorAddr = response.decoded.output.value0;
         shardC = getShardThis(connectorAddr);
         if (shardC === targetShard) {
-            // console.log("sharding+++++++++++",sountArr.filter(item=>item===shardC))
+            console.log("sharding--------",n,shardC, targetShard)
             let resp = await RootTknContract.runLocal("getWalletAddress", {_answer_id: 0, wallet_public_key_: 0, owner_address_: connectorAddr})
             walletAddr = resp.decoded.output.value0;
             shardW = getShardThis(walletAddr);
             if (shardW === targetShard) {
+
+                console.log("sharding+++++++++++",!sountArr.filter(item=>item===shardW).length)
                 connectorSoArg0 = n;
                 status = true;
             } else {
@@ -290,10 +296,10 @@ export async function getAllPairsWoithoutProvider() {
         itemData.pairAddress = item[0];
 
         // itemData.pairname = hex2a(curRootDataAB.decoded.output.value0.name)
-        itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol) === 'WTON' ? 'TON' : hex2a(curRootDataA.decoded.output.value0.symbol)
+        itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol)
         itemData.reserveA = bal.decoded.output.balanceReserve[item[1].root0]
 
-        itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol) === 'WTON' ? 'TON' : hex2a(curRootDataB.decoded.output.value0.symbol)
+        itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol)
         itemData.reservetB = bal.decoded.output.balanceReserve[item[1].root1]
 
         itemData.rateAB = +bal.decoded.output.balanceReserve[item[1].root1] / +bal.decoded.output.balanceReserve[item[1].root0]
@@ -586,9 +592,12 @@ export async function checkSouint(clientAddress) {
         let connectorsArr = await getConnectors(clientAddress)
         let souintArr = []
         for (const item of Object.values(connectorsArr)) {
-            souintArr.push(await getSouint(item))
+
+            let BIValue = Number(await getSouint(item))
+            souintArr.push(BIValue)
         }
-        console.log("souintArr",souintArr)
+
+        console.log("sountArr", souintArr.filter(item=>item===39).length)
         return souintArr;
     } catch (e) {
         console.log("catch E", e);

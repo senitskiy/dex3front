@@ -70,12 +70,7 @@ useEffect(async ()=>{
         allWallets.forEach(async item => await subscribe(item.walletAddress));
 let liquidityListST = allWallets.filter(i => i.symbol.includes('/'));
 
-let tokenListST = allWallets.filter(i => !i.symbol.includes('/')).map(i => (
-    {
-        ...i,
-        symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
-    })
-);
+let tokenListST = allWallets.filter(i => !i.symbol.includes('/'));
 
     //localStorage.setItem('tokenList', JSON.stringify(tokenListST));
     //localStorage.setItem('liquidityList', JSON.stringify(liquidityListST));
@@ -109,12 +104,7 @@ let tokenListST = allWallets.filter(i => !i.symbol.includes('/')).map(i => (
 
         let liquidityListST = allWallets.filter(i => i.symbol.includes('/'));
 
-        let tokenListST = allWallets.filter(i => !i.symbol.includes('/')).map(i => (
-            {
-                ...i,
-                symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
-            })
-        );
+        let tokenListST = allWallets.filter(i => !i.symbol.includes('/'))
 
         localStorage.setItem('tokenList', JSON.stringify(tokenListST));
         localStorage.setItem('liquidityList', JSON.stringify(liquidityListST));
@@ -167,9 +157,11 @@ if(allWallets.length > (tokenList.length + LPTokenList.length)){
                 // handleBlur={handleClose}
                 button={<CloseBtn func={handleClose}/>}
                 content={
-
+                    !walletIsConnected ?
+                        <button className="btn mainblock-btn" onClick={() => history.push('/account')}>Connect wallet</button>
+                        :
                     !tokenList.length && !LPTokenList.length ?  <div><p className="wallet-ballance" style={{"margin":"0","marginBottom":"10px"}}>You don't have any wallets for your assets.</p>
-                            <p className="wallet-ballance" style={{"margin":"0","marginBottom":"10px"}}>Please go to "Swap", choose a pair of assets and connect to a pair and come back — we'll create some wallets for you here.</p></div> :
+                            <p className="wallet-ballance" style={{"margin":"0","marginBottom":"10px"}}>Please go to "Swap", choose a pair of assets and "Connect pair", then come back — we'll create some wallets for you here.</p></div> :
                         (<>
                             <SearchInput func={setFilter.bind(this)}/>
                             <div className="select-list">

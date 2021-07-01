@@ -402,21 +402,20 @@ let resArray = []
         for (const item of newArr) {
             console.log("getting shard")
             let soUint = await getShardConnectPairQUERY(clientAdr, targetShard, item)
-            console.log("connection to roots", item,"soUint",soUint)
 
 
-            let connectRootRes = await callMethod("connectRoot", {
-                root: item,
-                souint: soUint,
-                gramsToConnector: 500000000,
-                gramsToRoot: 1500000000
-            }, clientContract)
-            resArray.push(connectRootRes)
-            console.log("connectRootRes.code", resArray)
-            if (connectRootRes.code) {
-                console.log("connectRootRes.code", connectRootRes.code)
-                return connectRootRes
-            }
+                    let connectRootRes = await callMethod("connectRoot", {
+                        root: item,
+                        souint: soUint,
+                        gramsToConnector: 500000000,
+                        gramsToRoot: 1500000000
+                    }, clientContract)
+                    resArray.push(connectRootRes)
+                    console.log("connectRootRes.code", resArray)
+                    if (connectRootRes.code) {
+                        console.log("connectRootRes.code", connectRootRes.code)
+                        return connectRootRes
+                    }
         }
         return {status: "success", resArray: resArray}
     }catch(e){

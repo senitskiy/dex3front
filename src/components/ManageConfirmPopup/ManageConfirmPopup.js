@@ -58,7 +58,7 @@ console.log("curPair",curPair)
               <span className="confirm-value">{parseFloat(balance.toFixed(4))}</span>
               <img className="confirm-icon" src={iconGenerator(fromToken.symbol)} alt={fromToken.symbol} />
               <img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol} />
-              <span className="confirm-token">{fromToken.symbol}/{toToken.symbol}</span>
+              <span className="confirm-token">DS-{fromToken.symbol}/{toToken.symbol} LP Tokens</span>
             </div>
             <button onClick={handleSupplyClick} to={'/add-liquidity'} className="btn popup-btn">Supply</button>
             {balance !== 0 ? <div className="manage-remove-link"><span onClick={() => props.func()}>Remove</span></div> : null}
@@ -73,7 +73,7 @@ console.log("curPair",curPair)
                   <p className="mainblock-footer-subtitle">Your total pool tokens</p>
                 </div>
                 <div className="swap-confirm-wrap">
-                  <p className="mainblock-footer-value">{poolShare.toFixed(4)}</p>
+                  <p className="mainblock-footer-value">{poolShare.toFixed(4)} %</p>
                   <p className="mainblock-footer-subtitle">Your pool share</p>
                 </div>
               </div>

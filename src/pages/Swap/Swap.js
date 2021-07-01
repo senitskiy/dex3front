@@ -189,12 +189,7 @@ if(!pairsList.length || !pairId){
 
               liquidityList = tokenList.filter(i => i.symbol.includes('/'));
 
-              tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
-                  {
-                      ...i,
-                      symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
-                  })
-              );
+              tokenList = tokenList.filter(i => !i.symbol.includes('/'))
               //localStorage.setItem('tokenList', JSON.stringify(tokenList));
               //localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
               dispatch(setTokenList(tokenList));

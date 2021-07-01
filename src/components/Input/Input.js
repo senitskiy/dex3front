@@ -146,7 +146,15 @@ function Input(props) {
   const [changer,setChanger] = useState(0)
   useEffect(()=>{
 
-    setValue(changer)
+    if(location.pathname.includes('swap') && swapFromToken.symbol && swapToToken.symbol) {
+
+      setValue(changer)
+    }
+    if(location.pathname.includes('add-liquidity') && poolFromToken.symbol && poolToToken.symbol) {
+      setValue(changer)
+    }
+
+
   },[changer])
   useEffect(()=>{
 
