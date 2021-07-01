@@ -295,10 +295,10 @@ export async function getAllPairsWoithoutProvider() {
         itemData.pairAddress = item[0];
 
         // itemData.pairname = hex2a(curRootDataAB.decoded.output.value0.name)
-        itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol) === 'WTON' ? 'TON' : hex2a(curRootDataA.decoded.output.value0.symbol)
+        itemData.symbolA = hex2a(curRootDataA.decoded.output.value0.symbol)
         itemData.reserveA = bal.decoded.output.balanceReserve[item[1].root0]
 
-        itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol) === 'WTON' ? 'TON' : hex2a(curRootDataB.decoded.output.value0.symbol)
+        itemData.symbolB = hex2a(curRootDataB.decoded.output.value0.symbol)
         itemData.reservetB = bal.decoded.output.balanceReserve[item[1].root1]
 
         itemData.rateAB = +bal.decoded.output.balanceReserve[item[1].root1] / +bal.decoded.output.balanceReserve[item[1].root0]

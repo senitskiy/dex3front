@@ -116,12 +116,7 @@ function ConnectWallet() {
 
                 liquidityList = tokenList.filter(i => i.symbol.includes('/'));
 
-                tokenList = tokenList.filter(i => !i.symbol.includes('/')).map(i => (
-                    {
-                        ...i,
-                        symbol: i.symbol === 'WTON' ? 'TON' : i.symbol
-                    })
-                );
+                tokenList = tokenList.filter(i => !i.symbol.includes('/'))
 
                 dispatch(setTokenList(tokenList));
                 dispatch(setLiquidityList(liquidityList));
