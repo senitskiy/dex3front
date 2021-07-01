@@ -181,13 +181,13 @@ function SwapConfirmPopup(props) {
     let rootIn = 0
     let rootOut = 0
     pairsList.forEach(async i => {
-    // if(fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
+    if(fromToken.symbol === i.symbolA && toToken.symbol === i.symbolB) {
       rootIn = reserves[0].reserveA
       rootOut = reserves[0].reservetB
-    // }else{
-    //   rootIn = reserves[0].reserveA
-    //   rootOut = reserves[0].reservetB
-    // }
+    }else{
+      rootIn = reserves[0].reserveA
+      rootOut = reserves[0].reservetB
+    }
     })
 
     console.log("rootIn",rootIn,"amountIn",amountIn,"rootOut",rootOut)
