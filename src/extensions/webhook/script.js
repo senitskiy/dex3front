@@ -59,10 +59,13 @@ export async function getShardConnectPairQUERY(clientAddress,targetShard,rootAdd
     const accClient = new Account(DEXclientContract, {address: clientAddress, client});
     const RootTknContract = new Account(RootTokenContract, {address:rootAddress, client});
     let sountArr = await checkSouint(clientAddress)
+    console.log("sountArr=11111", sountArr)
     // web3.utils.toBN(String(totalSupply) + "0".repeat(decimalPrecision)),
-    let largestNum = sountArr.sort().pop()
+    let largestNum = sountArr.sort(function (a, b) {
+        return a - b;
+    }).reverse()
     console.log("sountArr==========", sountArr,largestNum)
-    let n = largestNum || 0;
+    let n = (largestNum[0] +1) || 0;
     let shardW
     let walletAddr
     while (!status) {
