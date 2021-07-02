@@ -186,7 +186,7 @@ function Input(props) {
         </div>
         <div className="input-wrapper">
           <input
-            type="number"
+            // type="number"
             className={props.value > 0 ? "input-field" : "input-field input-field--zero"}
             value={props.value}
             onChange={event => setChanger(+event.target.value)}
