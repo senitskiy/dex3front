@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import { useSelector, useDispatch } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import MainBlock from '../MainBlock/MainBlock';
@@ -19,10 +19,26 @@ function ManageConfirmPopup(props) {
   let curPair = pairS.filter(item=>item.pairAddress === pairId)
 console.log("curPair",curPair)
 
-  let poolShare = (balance*100)/(curPair && (curPair[0].totalSupply ? curPair[0].totalSupply : 1)/1000000000)
+  const [poolShare, setPoolShare] = useState(1)
+  useEffect(()=>{
+    let curP = curPair
+    let poolS = (balance*100)/(curP && (curP[0].totalSupply ? curP[0].totalSupply : 1)/1000000000)
+    setPoolShare(poolS)
+  },[pairId])
+
+  // let poolShare = (balance*100)/(curPair && (curPair[0].totalSupply ? curPair[0].totalSupply : 1)/1000000000)
   console.log("poolShare",poolShare)
-  let pooledTokensA = (curPair[0].reserveA/1000000000)*poolShare
-  let pooledTokensB = (curPair[0].reservetB/1000000000)*poolShare
+
+  const [pooledTokensA, setpooledTokensA] = useState(1)
+  const [pooledTokensB, setpooledTokensB] = useState(1)
+  useEffect(()=>{
+    let curP = curPair
+    let pooledTokensA = (curP[0].reserveA/1000000000)*poolShare
+    let pooledTokensB = (curP[0].reservetB/1000000000)*poolShare
+    setpooledTokensA(pooledTokensA)
+    setpooledTokensB(pooledTokensB)
+  },[poolShare])
+
   const handleSupplyClick = () => {
 
     tokenList.forEach(i => {
