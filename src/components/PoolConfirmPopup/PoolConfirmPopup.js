@@ -100,7 +100,7 @@ function PoolConfirmPopup(props) {
               <span className="confirm-value">~{props.lpAmount}</span>
               <img className="confirm-icon" src={iconGenerator(fromToken.symbol)} alt={fromToken.symbol}/>
               <img className="confirm-icon" src={iconGenerator(toToken.symbol)} alt={toToken.symbol}/>
-              <span className="confirm-token">DS-{fromToken.symbol}/{toToken.symbol} LP Tokens</span>
+              <span className="confirm-tokenF">DS-{fromToken.symbol}/{toToken.symbol} LP Tokens</span>
             </div>
             <p className="confirm-text">Output is estimated. If the price changes by more than 0.5% your transaction will revert</p>
             <button className="btn popup-btn" onClick={() => handleSuply()}>Confirm Supply</button>
