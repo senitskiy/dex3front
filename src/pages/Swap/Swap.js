@@ -48,7 +48,7 @@ function Swap () {
 
     const [connectAsyncIsWaiting, setconnectAsyncIsWaiting] = useState(false);
   const [curExist, setExistsPair] = useState(false);
-    const [curPia, setCurrentPair] = useState([]);
+    // const [curPia, setCurrentPair] = useState([]);
     const [notDeployedWallets, setNotDeployedWallets] = useState([]);
     const [connectPairStatusText, setconnectPairStatusText] = useState("");
 
@@ -59,9 +59,9 @@ if(!pairsList.length || !pairId){
 }
       // if(!curePairData || !curePairData[0])return
    let curePairData = pairsList && pairsList.filter(item=>item.pairAddress===pairId)
-      console.log("pairsList CKECK 0",pairsList, "pairId",pairId)
-    setExistsPair(curePairData[0].exists)
-      setCurrentPair(curePairData)
+      console.log("pairsList CKECK 0",curePairData)
+    setExistsPair(curePairData[0].exists ? curePairData[0].exists : false)
+      // setCurrentPair(curePairData)
 
     //  if(!curePairData || !curePairData[0])return
     //  let walExists = curePairData[0].walletExists.filter(item=>item.status===false)
@@ -69,7 +69,7 @@ if(!pairsList.length || !pairId){
 
     // console.log("walExists",walExists)
 
-  },[tokenList,pairsList, pairId])
+  },[pairId])
 
 
     useEffect(()=>{
@@ -122,7 +122,7 @@ if(!pairsList.length || !pairId){
 
     setconnectAsyncIsWaiting(true);
       setconnectPairStatusText("getting data from pair.")
-        let connectRes = await connectToPair(curExt, pairId, curPia);
+        let connectRes = await connectToPair(curExt, pairId);
 
       console.log("connectRes",connectRes)
       if(!connectRes || (connectRes && (connectRes.code === 1000 || connectRes.code === 3 || connectRes.code === 2))){

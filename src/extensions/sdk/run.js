@@ -139,10 +139,11 @@ export async function createDEXclient(curExt, shardData) {
 
     try {
         const rootContract = await contract(DEXrootContract.abi, Radiance.networks['2'].dexroot);
-        await callMethod("createDEXclient", {
+        let createDEXclientStatus = await callMethod("createDEXclient", {
             pubkey: shardData.keys,
             souint: shardData.clientSoArg
         }, rootContract).catch(e => {
+            console.log("createDEXclienteeeeee",e)
                 let ecode = '106';
                 let found = e.text.match(ecode);
                 if(found){
@@ -152,11 +153,12 @@ export async function createDEXclient(curExt, shardData) {
                 }
             }
         )
-
+console.log("createDEXclientStatus",createDEXclientStatus)
         let checkDexClientExists =  await checkPubKey(pubkey);
         let n=0
         console.log("checkDexClientExists",checkDexClientExists)
         while(!checkDexClientExists.status){
+            console.log("checkDexClientExists",checkDexClientExists)
             checkDexClientExists =  await checkPubKey(pubkey);
 
             if(n>1500){
@@ -309,7 +311,7 @@ export async function processLiquidity(curExt,pairAddr, qtyA, qtyB) {
  * @return   {object} processLiquidity
  */
 
-export async function connectToPair(curExt,pairAddr,curPia) {
+export async function connectToPair(curExt,pairAddr) {
     // console.log("pairAddr",pairAddr,"curExt",curExt)
     const {contract,callMethod,pubkey} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
