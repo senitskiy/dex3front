@@ -163,40 +163,40 @@ if(!pairsList.length || !pairId){
       setconnectPairStatusText("finishing")
 
 
-          let tokenList = await getAllClientWallets(pubKey.address);
-      tokenList.forEach(async item => await subscribe(item.walletAddress));
-          let countT = tokenList.length
-          let y = 0
-          while (tokenList.length < countT) {
-
-              tokenList = await getAllClientWallets(pubKey.address);
-              y++
-              if (y > 500) {
-                  dispatch(showPopup({
-                      type: 'error',
-                      message: 'Oops, too much time for deploying. Please connect your wallet again.'
-                  }));
-              }
-          }
-
-          dispatch(setTokenList(tokenList));
-
-
-          let liquidityList = [];
-
-          if (tokenList.length) {
-              tokenList.forEach(async item => await subscribe(item.walletAddress));
-
-              liquidityList = tokenList.filter(i => i.symbol.includes('/'));
-
-              tokenList = tokenList.filter(i => !i.symbol.includes('/'))
-              //localStorage.setItem('tokenList', JSON.stringify(tokenList));
-              //localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
-              dispatch(setTokenList(tokenList));
-              dispatch(setLiquidityList(liquidityList));
-          }
+      //     let tokenList = await getAllClientWallets(pubKey.address);
+      // // tokenList.forEach(async item => await subscribe(item.walletAddress));
+      //     let countT = tokenList.length
+      //     let y = 0
+      //     while (tokenList.length < countT) {
+      //
+      //         tokenList = await getAllClientWallets(pubKey.address);
+      //         y++
+      //         if (y > 500) {
+      //             dispatch(showPopup({
+      //                 type: 'error',
+      //                 message: 'Oops, too much time for deploying. Please connect your wallet again.'
+      //             }));
+      //         }
+      //     }
+      //
+      //     dispatch(setTokenList(tokenList));
+      //
+      //
+      //     let liquidityList = [];
+      //
+      //     if (tokenList.length) {
+      //         tokenList.forEach(async item => await subscribe(item.walletAddress));
+      //
+      //         liquidityList = tokenList.filter(i => i.symbol.includes('/'));
+      //
+      //         tokenList = tokenList.filter(i => !i.symbol.includes('/'))
+      //         //localStorage.setItem('tokenList', JSON.stringify(tokenList));
+      //         //localStorage.setItem('liquidityList', JSON.stringify(liquidityList));
+      //         dispatch(setTokenList(tokenList));
+      //         dispatch(setLiquidityList(liquidityList));
+      //     }
           setconnectAsyncIsWaiting(false);
-          // setExistsPair(true)
+          setExistsPair(true)
 
   }
 

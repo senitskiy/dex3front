@@ -198,7 +198,7 @@ export async function transfer(SendTransfer,addressTo,amount) {
  */
 
 export async function swapA(curExt,pairAddr, qtyA) {
-    console.log("qtyA",qtyA)
+    console.log("qtyA",qtyA, typeof qtyA)
     const {pubkey, contract, callMethod,SendTransfer} = curExt._extLib
     let getClientAddressFromRoot = await checkPubKey(pubkey)
     if(getClientAddressFromRoot.status === false){
@@ -207,7 +207,7 @@ export async function swapA(curExt,pairAddr, qtyA) {
 
     try {
         const clientContract = await contract(DEXclientContract.abi, getClientAddressFromRoot.dexclient);
-        const processSwapA = await callMethod("processSwapA", {pairAddr:pairAddr, qtyA:qtyA}, clientContract)
+        const processSwapA = await callMethod("processSwapA", {pairAddr:pairAddr, qtyA:Number(qtyA)}, clientContract)
         console.log("processSwapA",processSwapA)
         transferFromGiver(getClientAddressFromRoot.dexclient, 300000000).then(res=>console.log("sucess ended",res))
         return processSwapA

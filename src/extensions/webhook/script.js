@@ -400,7 +400,7 @@ export async function subscribeClient(address) {
         // "connectCallback"
         console.log("client params", params, "decoded", decoded)
         if(decoded.name === "connectCallback") {
-            console.log("client params", params, "decoded", decoded)
+            console.log("connectCallback", params, "decoded", decoded)
             let caseID3 = await checkMessagesAmountClient({
                 name: decoded.name,
                 src: params.result.src || "default",

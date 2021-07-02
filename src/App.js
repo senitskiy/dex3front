@@ -206,6 +206,18 @@ console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey2.d
             })
             console.log("pairspairspairs",pairs)
             dispatch(setPairsList(arrPairs));
+
+            let liquidityList = [];
+            let tokenList = await getAllClientWallets(pubKey.address);
+                if (tokenList.length) {
+                    tokenList.forEach(async item => await subscribe(item.walletAddress));
+
+                    liquidityList = tokenList.filter(i => i.symbol.includes('/'));
+
+                    tokenList = tokenList.filter(i => !i.symbol.includes('/'))
+                    dispatch(setTokenList(tokenList));
+                    dispatch(setLiquidityList(liquidityList));
+                }
         }
         if(subscribeData.name === "accept") {
             const pairs = await getAllPairsWoithoutProvider();
@@ -303,6 +315,9 @@ console.log("clientBalanceAT WEBHOOK",clientBalance,"pubKey.dexclient",pubKey2.d
     }
       // setonloading(false)
   }, [subscribeData]);
+
+
+
 
   return (
     <>
