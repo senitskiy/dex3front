@@ -129,8 +129,8 @@ function ConnectWallet() {
             dispatch(setPubKey(pubKey));
             dispatch(setWallet({id: pubKey.dexclient, balance: clientBalance}));
 
-            localStorage.setItem('pubKey', JSON.stringify(pubKey));
-            localStorage.setItem('wallet', JSON.stringify({id: pubKey.dexclient, balance: clientBalance}));
+            // localStorage.setItem('pubKey', JSON.stringify(pubKey));
+            // localStorage.setItem('wallet', JSON.stringify({id: pubKey.dexclient, balance: clientBalance}));
             tokenList.forEach(i => {
                 if(swapFromToken.symbol === i.symbol) {
                     swapFromToken.balance = i.balance;
