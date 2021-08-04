@@ -27,5 +27,5 @@ jobs:
         run: npm run build
       # Deploy
       - name: Deploy
-        run: rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . root@178.170.47.43:/var/www/bt/build/
+        run: rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . /var/www/bt/build/ #root@178.170.47.43:/var/www/bt/build/
         working-directory: ./dist
