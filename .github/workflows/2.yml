@@ -18,9 +18,9 @@ jobs:
         run: |
           set -eu
           mkdir "$HOME/.ssh"
-          echo "${{ secrets.TEST_KEY }}"
           echo "${{ secrets.TEST_KEY }}" > "$HOME/.ssh/key"
           chmod 600 "$HOME/.ssh/key"
+          chown root:root .ssh
       # Build
       - name: Install dependencies
         run: npm ci
@@ -28,21 +28,22 @@ jobs:
         run: npm run build
       # Deploy
       - name: Deploy
+        
       # run: rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . /var/www/bt/build/ #root@178.170.47.43:/var/www/bt/build/
-        run: rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" . /var/www/bt/build/ #root@178.170.47.43:/var/www/bt/build/
+        run: rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" . root@178.170.47.43:/var/www/bt/build/
         working-directory: ./dist
 
 
-      - name: Deploy to Server
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.DEPLOY_SERVER_HOST }}
-          port: ${{ secrets.DEPLOY_SERVER_PORT }}
-          username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
-          key: ${{ secrets.DEPLOY_SERVER_KEY }}
-          source: ${{ env.BUILD_SCRIPT_OUTPUT }}
-          target: ${{ env.DEPLOY_PATH }}/${{ env.BRANCH_NAME }}
-          strip_components: 1
+      # - name: Deploy to Server
+      #   uses: appleboy/scp-action@master
+      #   with:
+      #     host: ${{ secrets.DEPLOY_SERVER_HOST }}
+      #     port: ${{ secrets.DEPLOY_SERVER_PORT }}
+      #     username: ${{ secrets.DEPLOY_SERVER_USERNAME }}
+      #     key: ${{ secrets.DEPLOY_SERVER_KEY }}
+      #     source: ${{ env.BUILD_SCRIPT_OUTPUT }}
+      #     target: ${{ env.DEPLOY_PATH }}/${{ env.BRANCH_NAME }}
+      #     strip_components: 1
 
 
 
