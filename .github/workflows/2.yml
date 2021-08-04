@@ -28,9 +28,13 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-      # Deploy
-      - name: Deploy
-      # run: rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . /var/www/bt/build/ #root@178.170.47.43:/var/www/bt/build/
-        #run: rsync -flags source root@178.170.47.43:/var/www/bt/build/
-        run: rsync -avz ./dist/ root@178.170.47.43:/var/www/bt/build/
-        working-directory: ./dist
+        # Deploy
+      - name: Rsync Deployments Action
+        uses: Burnett01/rsync-deployments@5.0
+        with:
+          switches: -avzr --delete
+          path: ./build
+          remote_path: /var/www/bt/build/
+          remote_host: 178.170.47.43
+          remote_user: root
+          remote_key: ${{ secrets.TEST_KEY }}
