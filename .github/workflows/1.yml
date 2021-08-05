@@ -30,7 +30,13 @@ jobs:
       - name: Deploy
         
       # run: rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" --archive --compress --delete . /var/www/bt/build/ #root@178.170.47.43:/var/www/bt/build/
-        run: rsync -e "ssh -i $HOME/.ssh/key -o StrictHostKeyChecking=no" . root@178.170.47.43:/var/www/bt/build/
+      
+        name: Deploy to Server
+        uses: appleboy/scp-action@master
+        with:
+          key: ${{ secrets.test_key }}
+      
+        run: rsync -e "ssh -i key -o StrictHostKeyChecking=no" . root@178.170.47.43:/var/www/bt/build/
         # working-directory: ./dist
 
 
