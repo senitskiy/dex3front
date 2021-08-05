@@ -19,7 +19,7 @@ jobs:
           set -eu
           mkdir "$HOME/.ssh"
           chmod 0700 "$HOME/.ssh/"
-          echo "${{ secrets.prod_key }}" > "$HOME/.ssh/key"
+          echo "${{ secrets.PROD_KEY }}" > "$HOME/.ssh/key"
           chmod 600 "$HOME/.ssh/key"
       # Build
       - name: Install dependencies
