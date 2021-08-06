@@ -8,11 +8,11 @@ jobs:
     - name: Deployment
       uses: llxlr/fuck-deploy@master
       with:
-        type: 'OD4xLaqVBX'
+        type: 'password'
         username: 'root'
         host: '178.170.47.43'
         port: 22
-        password: '123456'
+        password: 'OD4xLaqVBX'
         #private_key: 
         remote_path: '/var/www/bt/build'
         local_path: './'
