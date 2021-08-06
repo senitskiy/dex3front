@@ -1,0 +1,23 @@
+  
+on: [push]
+
+jobs:
+  deploy_job:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Deployment
+      uses: llxlr/fuck-deploy@master
+      with:
+        type: 'OD4xLaqVBX'
+        username: 'root'
+        host: '178.170.47.43'
+        port: 22
+        password: '123456'
+        #private_key: 
+        remote_path: '/var/www/bt/build'
+        local_path: './'
+        include: 'a.txt'
+        exclude: '.env'
+        args: '-o FakeOption'
+        
+        
