@@ -3,7 +3,7 @@ on: [push]
 jobs:
   deploy_job:
     runs-on: ubuntu-latest
-    name: build&deploy
+    name: build&deploy 
     steps:
       # To use this repository's private action, you must check out the repository
       - name: Checkout
