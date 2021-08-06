@@ -4,7 +4,7 @@ on: [push]
 jobs:
   deploy_job:
     runs-on: ubuntu-latest
-    steps:
+    steps: 
     - name: Deployment
       uses: llxlr/fuck-deploy@master
       with:
