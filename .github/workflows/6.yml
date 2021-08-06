@@ -1,0 +1,19 @@
+on: push
+name: Deploy to CI over SFTP
+jobs:
+  FTP-Deploy-Action:
+    name: FTP-Deploy-Action
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+      with:
+        fetch-depth: 2
+    - name: deploy file
+      uses: wlixcc/SFTP-Deploy-Action@v1.0
+      with:
+        username: 'root'
+        server: '${{ secrets.REMOTE_HOST }}'
+        private_key: ${{ secrets.SERVER_SSH_KEY }} 
+        local_path: './*'
+        remote_path: '/var/www/bt/build' #make sure dir exist
+        args: '-o ConnectTimeout=5'
