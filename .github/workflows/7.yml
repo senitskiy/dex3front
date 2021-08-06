@@ -1,0 +1,32 @@
+on:
+ push:
+   branches: [ master ]
+ pull_request:
+   branches: [ master ]
+jobs:
+ deploy_job:
+   runs-on: ubuntu-latest
+   name: deploy
+   steps:
+     - name: Checkout
+       uses: actions/checkout@v2
+
+     - name: create ssh folder
+       run: mkdir /home/runner/.ssh/
+       
+     - name: create know hosts
+       run: ssh-keyscan -H 178.170.47.43 > /home/runner/.ssh/known_hosts
+       
+     - name: create private key
+       run: touch /home/runner/.ssh/private_key.pem
+       
+     - name: copy private key
+       run: 'echo "$SERVER_SSH_KEY" > /home/runner/.ssh/private_key.pem'
+       env:
+         SSH_KEY: ${{secrets.SFTP_PASSWORD}}
+               
+     - name: change permission to private key
+       run: chmod 400 /home/runner/.ssh/private_key.pem
+                                                                                             
+     - name: sftp run
+       run: sftp -i /home/runner/.ssh/private_key.pem root@178.170.47.43
