@@ -1,0 +1,8 @@
+steps:
+    - uses: actions/checkout@v1
+    - uses: hughcube/deploy-action@v1.0.0
+      with:
+        ssh_private_key: ${{ secrets.SERVER_SSH_KEY }}
+    - run: 
+        rsync --version
+        ssh ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "date"
