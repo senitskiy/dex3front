@@ -1,3 +1,11 @@
+  
+on: [push]
+
+jobs:
+  deploy_job:
+    runs-on: ubuntu-latest
+    name: build&deploy 
+
 steps:
     - uses: actions/checkout@v1
     - uses: hughcube/deploy-action@v1.0.0
